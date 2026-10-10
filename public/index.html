@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>短影音拍攝企劃助手</title>
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              bg: '#FDFBF7',
+              card: '#F7F3EE',
+              border: '#E6DDD4',
+              accent: '#C5A880',
+              accentHover: '#B3956D',
+              textPrimary: '#2C2623',
+              textSecondary: '#6E655F',
+            }
+          },
+          fontFamily: {
+            serif: ['"Noto Serif TC"', 'serif'],
+            sans: ['"Noto Sans TC"', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-brand-bg text-brand-textPrimary font-sans antialiased min-h-screen py-10 px-4">
+
+  <div class="max-w-4xl mx-auto">
+    <!-- Header Section -->
+    <header class="text-center mb-10">
+      <span class="text-xs tracking-widest uppercase text-brand-accent font-semibold bg-brand-card border border-brand-border px-3 py-1 rounded-full">AI Script Assistant</span>
+      <h1 class="font-serif text-3xl md:text-4xl font-bold mt-3 text-brand-textPrimary">短影音拍攝企劃助手</h1>
+      <p class="text-brand-textSecondary mt-2 text-sm md:text-base">專為新手打造的黃金爆款分鏡腳本生成器・即點即用</p>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Input Form -->
+      <section class="lg:col-span-5 bg-white p-6 rounded-2xl border border-brand-border shadow-sm">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="font-serif text-lg font-bold text-brand-textPrimary">企劃需求設定</h2>
+          <button id="btnPreset" class="text-xs text-brand-accent hover:underline focus:outline-none">✨ 帶入範例</button>
+        </div>
+
+        <form id="planForm" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold text-brand-textSecondary mb-1">影片主題</label>
+            <input type="text" id="topic" required placeholder="例如：新手必看的抗衰老精華挑選法" class="w-full text-sm p-3 rounded-xl border border-brand-border bg-brand-bg focus:ring-1 focus:ring-brand-accent focus:outline-none">
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-brand-textSecondary mb-1">想傳達的核心內容</label>
+            <textarea id="coreContent" rows="3" required placeholder="例如：介紹三種成分差異、避免踩雷的用法、CP值高的推薦" class="w-full text-sm p-3 rounded-xl border border-brand-border bg-brand-bg focus:ring-1 focus:ring-brand-accent focus:outline-none"></textarea>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-brand-textSecondary mb-1">影片風格</label>
+            <select id="style" class="w-full text-sm p-3 rounded-xl border border-brand-border bg-brand-bg focus:ring-1 focus:ring-brand-accent focus:outline-none">
+              <option value="質感美學/輕溫柔分享">質感美學 / 輕溫柔分享</option>
+              <option value="幽默風趣/接地氣">幽默風趣 / 接地氣</option>
+              <option value="專業幹練/乾貨滿滿">專業幹練 / 乾貨滿滿</option>
+              <option value="沉浸式/生活隨手記">沉浸式 / 生活隨手記</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold text-brand-textSecondary mb-1">預計影片長度</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex items-center justify-center p-2 rounded-xl border border-brand-border bg-brand-bg cursor-pointer text-xs font-medium text-brand-textPrimary hover:border-brand-accent">
+                <input type="radio" name="duration" value="30秒" checked class="mr-2 text-brand-accent"> 30 秒爆款 Short
+              </label>
+              <label class="flex items-center justify-center p-2 rounded-xl border border-brand-border bg-brand-bg cursor-pointer text-xs font-medium text-brand-textPrimary hover:border-brand-accent">
+                <input type="radio" name="duration" value="60秒" class="mr-2 text-brand-accent"> 60 秒深度影音
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" id="btnSubmit" class="w-full mt-2 py-3 bg-brand-accent hover:bg-brand-accentHover text-white font-medium text-sm rounded-xl transition-colors flex items-center justify-center space-x-2">
+            <span>✨ 立即生成拍攝企劃</span>
+          </button>
+        </form>
+      </section>
+
+      <!-- Output Result Area -->
+      <section class="lg:col-span-7 flex flex-col">
+        <div id="placeholderState" class="bg-brand-card p-10 rounded-2xl border border-dashed border-brand-border text-center flex-1 flex flex-col items-center justify-center">
+          <p class="text-brand-textSecondary text-sm">請在左側填寫需求並點擊生成，<br>AI 將為您安排黃金開場與完整分鏡腳本。</p>
+        </div>
+
+        <div id="loadingState" class="hidden bg-white p-10 rounded-2xl border border-brand-border text-center flex-1 flex flex-col items-center justify-center">
+          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-accent mb-3"></div>
+          <p class="text-brand-textPrimary text-sm font-medium">正在為您調配黃金爆款企劃...</p>
+          <p class="text-brand-textSecondary text-xs mt-1">規劃 Hook 開場、運鏡畫面與精準口白</p>
+        </div>
+
+        <div id="resultState" class="hidden space-y-4">
+          <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-brand-border">
+            <span id="scriptBadge" class="text-xs font-semibold px-3 py-1 bg-brand-card text-brand-accent rounded-full border border-brand-border">短影音企劃書</span>
+            <button id="btnCopy" class="text-xs bg-brand-textPrimary text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">📋 一鍵複製完整腳本</button>
+          </div>
+
+          <div id="scriptContent" class="bg-white p-6 rounded-2xl border border-brand-border shadow-sm space-y-6 text-sm">
+            <!-- Dynamic Content Output Here -->
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <script>
+    const planForm = document.getElementById('planForm');
+    const btnPreset = document.getElementById('btnPreset');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const placeholderState = document.getElementById('placeholderState');
+    const loadingState = document.getElementById('loadingState');
+    const resultState = document.getElementById('resultState');
+    const scriptContent = document.getElementById('scriptContent');
+    const btnCopy = document.getElementById('btnCopy');
+
+    let currentScriptText = '';
+
+    // 帶入預設美妝範例
+    btnPreset.addEventListener('click', () => {
+      document.getElementById('topic').value = '新手3分鐘搞定精緻偽素顏底妝';
+      document.getElementById('coreContent').value = '告別厚重面具感！分享妝前保濕技巧、粉底少許多次塗抹法、以及局部遮瑕定妝的正確順序。';
+      document.getElementById('style').value = '質感美學/輕溫柔分享';
+    });
+
+    planForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const topic = document.getElementById('topic').value;
+      const coreContent = document.getElementById('coreContent').value;
+      const style = document.getElementById('style').value;
+      const duration = document.querySelector('input[name="duration"]:checked').value;
+
+      placeholderState.classList.add('hidden');
+      resultState.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+
+      try {
+        const response = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ topic, coreContent, style, duration })
+        });
+
+        const data = await response.json();
+        
+        if (!response.ok) throw new Error(data.error || '生成失敗');
+
+        renderScript(data.result);
+        loadingState.classList.add('hidden');
+        resultState.classList.remove('hidden');
+
+      } catch (err) {
+        alert('生成出現錯誤：' + err.message);
+        loadingState.classList.add('hidden');
+        placeholderState.classList.remove('hidden');
+      }
+    });
+
+    function renderScript(data) {
+      currentScriptText = `【短影音企劃書】${data.title}\n\n【黃金Hook開場】\n${data.hook}\n\n【分鏡腳本】\n` + 
+        data.storyboard.map((s, i) => `段落 ${i+1}:\n🎥 畫面: ${s.visual}\n🗣️ 口白: ${s.audio}`).join('\n\n') +
+        `\n\n【結尾 Call to Action】\n${data.cta}`;
+
+      let html = `
+        <div class="border-b border-brand-border pb-4">
+          <h3 class="font-serif text-xl font-bold text-brand-textPrimary">${data.title}</h3>
+          <p class="text-xs text-brand-textSecondary mt-1">⏱️ 預估總時長：約 ${data.estimatedTime} | 建議節奏：${data.paceHint}</p>
+        </div>
+
+        <div class="bg-brand-card p-4 rounded-xl border border-brand-border">
+          <h4 class="font-serif font-bold text-brand-accent text-sm mb-1">🔥 黃金 3 秒 Hook 吸睛開場</h4>
+          <p class="font-medium text-brand-textPrimary">${data.hook}</p>
+        </div>
+
+        <div class="space-y-4">
+          <h4 class="font-serif font-bold text-brand-textPrimary text-sm">🎬 順序分鏡腳本</h4>
+      `;
+
+      data.storyboard.forEach((scene, index) => {
+        html += `
+          <div class="p-4 rounded-xl bg-brand-bg border border-brand-border grid grid-cols-1 md:grid-cols-12 gap-3">
+            <div class="md:col-span-1 flex md:flex-col items-center justify-center">
+              <span class="w-6 h-6 rounded-full bg-brand-accent text-white text-xs flex items-center justify-center font-bold">${index + 1}</span>
+            </div>
+            <div class="md:col-span-5 text-xs text-brand-textSecondary space-y-1">
+              <span class="font-semibold text-brand-accent block">🎥 拍攝畫面與鏡頭</span>
+              <p>${scene.visual}</p>
+            </div>
+            <div class="md:col-span-6 text-xs text-brand-textPrimary space-y-1">
+              <span class="font-semibold text-brand-accent block">🗣️ 口白台詞</span>
+              <p class="font-medium">${scene.audio}</p>
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+        </div>
+
+        <div class="bg-brand-card p-4 rounded-xl border border-brand-border">
+          <h4 class="font-serif font-bold text-brand-accent text-sm mb-1">📌 自然結尾 Call to Action (CTA)</h4>
+          <p class="text-brand-textPrimary text-xs">${data.cta}</p>
+        </div>
+      `;
+
+      scriptContent.innerHTML = html;
+    }
+
+    btnCopy.addEventListener('click', () => {
+      navigator.clipboard.writeText(currentScriptText).then(() => {
+        btnCopy.textContent = '✅ 已複製到剪貼簿';
+        setTimeout(() => { btnCopy.textContent = '📋 一鍵複製完整腳本'; }, 2000);
+      });
+    });
+  </script>
+</body>
+</html>
