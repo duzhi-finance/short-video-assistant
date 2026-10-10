@@ -1,0 +1,17 @@
+body { font-family: 'Noto Sans TC', sans-serif; background: #FBF9F5; color: #241E19; }
+h1, h2, h3 { text-wrap: balance; }
+.rule { height: 1px; background: linear-gradient(90deg, transparent, #B88E52 20%, #B88E52 80%, transparent); opacity: .45; }
+.no-scrollbar::-webkit-scrollbar { display: none; }
+.no-scrollbar { scrollbar-width: none; }
+.fade-in { animation: fadeIn .45s ease both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .fade-in { animation: none; } }
+input[type=range] { accent-color: #B88E52; }
+:focus-visible { outline: 2px solid #B88E52; outline-offset: 2px; }
+.prose-terms h2 { font-family: 'Noto Serif TC', serif; font-weight: 700; font-size: 1.25rem; margin-top: 2.25rem; margin-bottom: .75rem; }
+.prose-terms h3 { font-weight: 600; margin-top: 1.25rem; margin-bottom: .5rem; }
+.prose-terms p, .prose-terms li { line-height: 1.85; font-size: .925rem; color: #4A4039; }
+.prose-terms ol, .prose-terms ul { padding-left: 1.25rem; display: grid; gap: .35rem; }
+.prose-terms ol { list-style: decimal; }
+.prose-terms ul { list-style: disc; }
+.fill-in { background: #F3EEE7; border-bottom: 1px dashed #B88E52; padding: 0 .3em; color: #9F7741; }

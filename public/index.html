@@ -2,232 +2,221 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>短影音拍攝企劃助手</title>
-  <!-- Google Fonts -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>短影音爆款企劃大師</title>
+  <meta name="description" content="輸入主題，30 秒拿到 3 種開場、完整分鏡口白、結尾 CTA、封面大字與 Hashtag，還有拍攝用提詞器。">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&family=Noto+Serif+TC:wght@500;600;700&display=swap" rel="stylesheet">
-  <!-- Tailwind CSS CDN -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            brand: {
-              bg: '#FDFBF7',
-              card: '#F7F3EE',
-              border: '#E6DDD4',
-              accent: '#C5A880',
-              accentHover: '#B3956D',
-              textPrimary: '#2C2623',
-              textSecondary: '#6E655F',
-            }
-          },
-          fontFamily: {
-            serif: ['"Noto Serif TC"', 'serif'],
-            sans: ['"Noto Sans TC"', 'sans-serif'],
-          }
-        }
-      }
-    }
-  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&family=Noto+Serif+TC:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/assets/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/assets/site.css">
 </head>
-<body class="bg-brand-bg text-brand-textPrimary font-sans antialiased min-h-screen py-10 px-4">
+<body data-page="home" class="antialiased min-h-screen selection:bg-editorial-accent selection:text-white">
+  <div id="site-header"></div>
 
-  <div class="max-w-4xl mx-auto">
-    <!-- Header Section -->
-    <header class="text-center mb-10">
-      <span class="text-xs tracking-widest uppercase text-brand-accent font-semibold bg-brand-card border border-brand-border px-3 py-1 rounded-full">AI Script Assistant</span>
-      <h1 class="font-serif text-3xl md:text-4xl font-bold mt-3 text-brand-textPrimary">短影音拍攝企劃助手</h1>
-      <p class="text-brand-textSecondary mt-2 text-sm md:text-base">專為新手打造的黃金爆款分鏡腳本生成器・即點即用</p>
-    </header>
-
-    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-      
-      <!-- Input Form -->
-      <section class="lg:col-span-5 bg-white p-6 rounded-2xl border border-brand-border shadow-sm">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="font-serif text-lg font-bold text-brand-textPrimary">企劃需求設定</h2>
-          <button id="btnPreset" class="text-xs text-brand-accent hover:underline focus:outline-none">✨ 帶入範例</button>
+  <main>
+    <!-- Hero -->
+    <section class="max-w-6xl mx-auto px-4 pt-14 md:pt-20 pb-12 grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
+      <div class="lg:col-span-6 fade-in">
+        <p class="font-display italic text-editorial-accent text-sm md:text-base">The Short-Video Edition</p>
+        <h1 class="font-serif text-4xl md:text-6xl leading-[1.15] mt-3" style="font-weight:900">
+          開拍前，<br>腳本已經寫好了
+        </h1>
+        <p class="text-editorial-muted text-base md:text-lg leading-relaxed mt-5 max-w-xl">
+          輸入主題和想講的重點，馬上拿到 3 種開場、完整分鏡口白、結尾互動句、封面大字和 Hashtag。架好手機，打開提詞器就能直接拍。
+        </p>
+        <div class="flex flex-wrap gap-3 mt-8">
+          <a href="#pricing" class="bg-editorial-dark hover:bg-editorial-accent text-white text-sm px-6 py-3.5 rounded-full transition shadow-md">立即購買 · <span data-price></span></a>
+          <a href="/app" class="border border-editorial-border hover:border-editorial-accent bg-white text-sm px-6 py-3.5 rounded-full transition">先看範例成果</a>
         </div>
+        <p class="text-xs text-editorial-muted mt-4">一次買斷，不用月費</p>
+      </div>
 
-        <form id="planForm" class="space-y-4">
-          <div>
-            <label class="block text-xs font-semibold text-brand-textSecondary mb-1">影片主題</label>
-            <input type="text" id="topic" required placeholder="例如：新手必看的抗衰老精華挑選法" class="w-full text-sm p-3 rounded-xl border border-brand-border bg-brand-bg focus:ring-1 focus:ring-brand-accent focus:outline-none">
+      <!-- 範例預覽卡 -->
+      <div class="lg:col-span-6 fade-in" style="animation-delay:.1s">
+        <div class="bg-white rounded-3xl border border-editorial-border shadow-sm p-6 md:p-7">
+          <div class="flex items-center justify-between">
+            <p class="font-display italic text-editorial-accent text-xs">The Script</p>
+            <span class="text-[11px] px-2.5 py-1 rounded-full bg-editorial-card border border-editorial-border text-editorial-muted">範例 · 30 秒</span>
           </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-brand-textSecondary mb-1">想傳達的核心內容</label>
-            <textarea id="coreContent" rows="3" required placeholder="例如：介紹三種成分差異、避免踩雷的用法、CP值高的推薦" class="w-full text-sm p-3 rounded-xl border border-brand-border bg-brand-bg focus:ring-1 focus:ring-brand-accent focus:outline-none"></textarea>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-brand-textSecondary mb-1">影片風格</label>
-            <select id="style" class="w-full text-sm p-3 rounded-xl border border-brand-border bg-brand-bg focus:ring-1 focus:ring-brand-accent focus:outline-none">
-              <option value="質感美學/輕溫柔分享">質感美學 / 輕溫柔分享</option>
-              <option value="幽默風趣/接地氣">幽默風趣 / 接地氣</option>
-              <option value="專業幹練/乾貨滿滿">專業幹練 / 乾貨滿滿</option>
-              <option value="沉浸式/生活隨手記">沉浸式 / 生活隨手記</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-xs font-semibold text-brand-textSecondary mb-1">預計影片長度</label>
-            <div class="grid grid-cols-2 gap-3">
-              <label class="flex items-center justify-center p-2 rounded-xl border border-brand-border bg-brand-bg cursor-pointer text-xs font-medium text-brand-textPrimary hover:border-brand-accent">
-                <input type="radio" name="duration" value="30秒" checked class="mr-2 text-brand-accent"> 30 秒爆款 Short
-              </label>
-              <label class="flex items-center justify-center p-2 rounded-xl border border-brand-border bg-brand-bg cursor-pointer text-xs font-medium text-brand-textPrimary hover:border-brand-accent">
-                <input type="radio" name="duration" value="60秒" class="mr-2 text-brand-accent"> 60 秒深度影音
-              </label>
+          <h2 class="font-serif font-bold text-xl md:text-2xl mt-2 leading-snug">偽素顏的秘密，是「少擦」不是「多擦」</h2>
+          <div class="rule my-5"></div>
+          <p class="text-[11px] font-semibold tracking-widest text-editorial-accentHover">開場 · 反常識顛覆型</p>
+          <p class="font-serif font-semibold text-lg mt-1.5 leading-relaxed">「想要好皮感，粉底請先少擠一半。」</p>
+          <div class="mt-5 rounded-2xl border border-editorial-border overflow-hidden text-xs">
+            <div class="grid grid-cols-12 bg-editorial-card text-editorial-muted font-semibold tracking-widest">
+              <div class="col-span-5 px-3 py-2">鏡頭畫面</div>
+              <div class="col-span-7 px-3 py-2 border-l border-editorial-border">口白</div>
+            </div>
+            <div class="grid grid-cols-12 border-t border-editorial-border">
+              <div class="col-span-5 px-3 py-3 text-editorial-muted leading-relaxed">濕海綿由內往外輕拍，慢動作</div>
+              <div class="col-span-7 px-3 py-3 border-l border-editorial-border font-medium leading-relaxed">從內往外拍開，邊緣自然變薄，不會有面具線。</div>
+            </div>
+            <div class="grid grid-cols-12 border-t border-editorial-border bg-editorial-bg/60">
+              <div class="col-span-5 px-3 py-3 text-editorial-muted leading-relaxed">細刷點遮瑕在痘印與眼下</div>
+              <div class="col-span-7 px-3 py-3 border-l border-editorial-border font-medium leading-relaxed">有瑕疵的地方才局部遮瑕，看起來才是「皮膚好」。</div>
             </div>
           </div>
-
-          <button type="submit" id="btnSubmit" class="w-full mt-2 py-3 bg-brand-accent hover:bg-brand-accentHover text-white font-medium text-sm rounded-xl transition-colors flex items-center justify-center space-x-2">
-            <span>✨ 立即生成拍攝企劃</span>
-          </button>
-        </form>
-      </section>
-
-      <!-- Output Result Area -->
-      <section class="lg:col-span-7 flex flex-col">
-        <div id="placeholderState" class="bg-brand-card p-10 rounded-2xl border border-dashed border-brand-border text-center flex-1 flex flex-col items-center justify-center">
-          <p class="text-brand-textSecondary text-sm">請在左側填寫需求並點擊生成，<br>AI 將為您安排黃金開場與完整分鏡腳本。</p>
-        </div>
-
-        <div id="loadingState" class="hidden bg-white p-10 rounded-2xl border border-brand-border text-center flex-1 flex flex-col items-center justify-center">
-          <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-accent mb-3"></div>
-          <p class="text-brand-textPrimary text-sm font-medium">正在為您調配黃金爆款企劃...</p>
-          <p class="text-brand-textSecondary text-xs mt-1">規劃 Hook 開場、運鏡畫面與精準口白</p>
-        </div>
-
-        <div id="resultState" class="hidden space-y-4">
-          <div class="flex justify-between items-center bg-white p-4 rounded-xl border border-brand-border">
-            <span id="scriptBadge" class="text-xs font-semibold px-3 py-1 bg-brand-card text-brand-accent rounded-full border border-brand-border">短影音企劃書</span>
-            <button id="btnCopy" class="text-xs bg-brand-textPrimary text-white px-3 py-1.5 rounded-lg hover:opacity-90 transition-opacity">📋 一鍵複製完整腳本</button>
-          </div>
-
-          <div id="scriptContent" class="bg-white p-6 rounded-2xl border border-brand-border shadow-sm space-y-6 text-sm">
-            <!-- Dynamic Content Output Here -->
+          <div class="flex flex-wrap gap-2 mt-5">
+            <span class="text-[11px] px-2.5 py-1 rounded-full bg-editorial-bg border border-editorial-border">#偽素顏</span>
+            <span class="text-[11px] px-2.5 py-1 rounded-full bg-editorial-bg border border-editorial-border">#底妝教學</span>
+            <span class="text-[11px] px-2.5 py-1 rounded-full bg-editorial-bg border border-editorial-border">#新手化妝</span>
           </div>
         </div>
-      </section>
+      </div>
+    </section>
 
-    </div>
-  </div>
-
-  <script>
-    const planForm = document.getElementById('planForm');
-    const btnPreset = document.getElementById('btnPreset');
-    const btnSubmit = document.getElementById('btnSubmit');
-    const placeholderState = document.getElementById('placeholderState');
-    const loadingState = document.getElementById('loadingState');
-    const resultState = document.getElementById('resultState');
-    const scriptContent = document.getElementById('scriptContent');
-    const btnCopy = document.getElementById('btnCopy');
-
-    let currentScriptText = '';
-
-    // 帶入預設美妝範例
-    btnPreset.addEventListener('click', () => {
-      document.getElementById('topic').value = '新手3分鐘搞定精緻偽素顏底妝';
-      document.getElementById('coreContent').value = '告別厚重面具感！分享妝前保濕技巧、粉底少許多次塗抹法、以及局部遮瑕定妝的正確順序。';
-      document.getElementById('style').value = '質感美學/輕溫柔分享';
-    });
-
-    planForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const topic = document.getElementById('topic').value;
-      const coreContent = document.getElementById('coreContent').value;
-      const style = document.getElementById('style').value;
-      const duration = document.querySelector('input[name="duration"]:checked').value;
-
-      placeholderState.classList.add('hidden');
-      resultState.classList.add('hidden');
-      loadingState.classList.remove('hidden');
-
-      try {
-        const response = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ topic, coreContent, style, duration })
-        });
-
-        const data = await response.json();
-        
-        if (!response.ok) throw new Error(data.error || '生成失敗');
-
-        renderScript(data.result);
-        loadingState.classList.add('hidden');
-        resultState.classList.remove('hidden');
-
-      } catch (err) {
-        alert('生成出現錯誤：' + err.message);
-        loadingState.classList.add('hidden');
-        placeholderState.classList.remove('hidden');
-      }
-    });
-
-    function renderScript(data) {
-      currentScriptText = `【短影音企劃書】${data.title}\n\n【黃金Hook開場】\n${data.hook}\n\n【分鏡腳本】\n` + 
-        data.storyboard.map((s, i) => `段落 ${i+1}:\n🎥 畫面: ${s.visual}\n🗣️ 口白: ${s.audio}`).join('\n\n') +
-        `\n\n【結尾 Call to Action】\n${data.cta}`;
-
-      let html = `
-        <div class="border-b border-brand-border pb-4">
-          <h3 class="font-serif text-xl font-bold text-brand-textPrimary">${data.title}</h3>
-          <p class="text-xs text-brand-textSecondary mt-1">⏱️ 預估總時長：約 ${data.estimatedTime} | 建議節奏：${data.paceHint}</p>
-        </div>
-
-        <div class="bg-brand-card p-4 rounded-xl border border-brand-border">
-          <h4 class="font-serif font-bold text-brand-accent text-sm mb-1">🔥 黃金 3 秒 Hook 吸睛開場</h4>
-          <p class="font-medium text-brand-textPrimary">${data.hook}</p>
-        </div>
-
-        <div class="space-y-4">
-          <h4 class="font-serif font-bold text-brand-textPrimary text-sm">🎬 順序分鏡腳本</h4>
-      `;
-
-      data.storyboard.forEach((scene, index) => {
-        html += `
-          <div class="p-4 rounded-xl bg-brand-bg border border-brand-border grid grid-cols-1 md:grid-cols-12 gap-3">
-            <div class="md:col-span-1 flex md:flex-col items-center justify-center">
-              <span class="w-6 h-6 rounded-full bg-brand-accent text-white text-xs flex items-center justify-center font-bold">${index + 1}</span>
-            </div>
-            <div class="md:col-span-5 text-xs text-brand-textSecondary space-y-1">
-              <span class="font-semibold text-brand-accent block">🎥 拍攝畫面與鏡頭</span>
-              <p>${scene.visual}</p>
-            </div>
-            <div class="md:col-span-6 text-xs text-brand-textPrimary space-y-1">
-              <span class="font-semibold text-brand-accent block">🗣️ 口白台詞</span>
-              <p class="font-medium">${scene.audio}</p>
-            </div>
+    <!-- 痛點 -->
+    <section class="bg-editorial-card/60 border-y border-editorial-border/70">
+      <div class="max-w-4xl mx-auto px-4 py-14 text-center">
+        <p class="font-display italic text-editorial-accent text-sm">Sound familiar?</p>
+        <h2 class="font-serif font-bold text-2xl md:text-3xl mt-2">想拍短影音，卻總是卡在開拍前</h2>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 text-left">
+          <div class="bg-white rounded-2xl border border-editorial-border p-5">
+            <p class="font-serif font-semibold">第一句不知道怎麼講</p>
+            <p class="text-sm text-editorial-muted mt-2 leading-relaxed">前 3 秒沒抓住人，後面講得再好也沒人看到。</p>
           </div>
-        `;
-      });
-
-      html += `
+          <div class="bg-white rounded-2xl border border-editorial-border p-5">
+            <p class="font-serif font-semibold">畫面不知道怎麼拍</p>
+            <p class="text-sm text-editorial-muted mt-2 leading-relaxed">有內容但沒分鏡，拍完才發現素材不夠剪。</p>
+          </div>
+          <div class="bg-white rounded-2xl border border-editorial-border p-5">
+            <p class="font-serif font-semibold">一對鏡頭就忘詞</p>
+            <p class="text-sm text-editorial-muted mt-2 leading-relaxed">反覆 NG，一支 30 秒影片拍了一小時。</p>
+          </div>
         </div>
+      </div>
+    </section>
 
-        <div class="bg-brand-card p-4 rounded-xl border border-brand-border">
-          <h4 class="font-serif font-bold text-brand-accent text-sm mb-1">📌 自然結尾 Call to Action (CTA)</h4>
-          <p class="text-brand-textPrimary text-xs">${data.cta}</p>
+    <!-- 功能 -->
+    <section id="features" class="max-w-6xl mx-auto px-4 py-16 md:py-20 scroll-mt-20">
+      <div class="text-center max-w-2xl mx-auto">
+        <p class="font-display italic text-editorial-accent text-sm">What you get</p>
+        <h2 class="font-serif font-bold text-2xl md:text-4xl mt-2">一份企劃，從開場寫到 Hashtag</h2>
+        <p class="text-editorial-muted mt-3">每次生成都會拿到這五樣東西，照著拍就好。</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-10">
+        <article class="bg-white rounded-3xl border border-editorial-border p-6">
+          <p class="text-[11px] font-semibold tracking-widest text-editorial-accentHover">HOOK A/B TEST</p>
+          <h3 class="font-serif font-bold text-lg mt-2">3 種黃金 3 秒開場</h3>
+          <p class="text-sm text-editorial-muted mt-2 leading-relaxed">痛點共鳴、反常識顛覆、懸念好奇各一句，附開場畫面。選一個當正式開場，其他留著測試。</p>
+        </article>
+        <article class="bg-white rounded-3xl border border-editorial-border p-6">
+          <p class="text-[11px] font-semibold tracking-widest text-editorial-accentHover">STORYBOARD</p>
+          <h3 class="font-serif font-bold text-lg mt-2">畫面與口白分鏡表</h3>
+          <p class="text-sm text-editorial-muted mt-2 leading-relaxed">每一段都寫好鏡頭怎麼拍、這時候說什麼，口白長度符合 30 秒或 60 秒。</p>
+        </article>
+        <article class="bg-white rounded-3xl border border-editorial-border p-6">
+          <p class="text-[11px] font-semibold tracking-widest text-editorial-accentHover">CALL TO ACTION</p>
+          <h3 class="font-serif font-bold text-lg mt-2">讓人想留言的結尾</h3>
+          <p class="text-sm text-editorial-muted mt-2 leading-relaxed">用提問收尾，給觀眾一個非留言不可的理由，互動數跟著上來。</p>
+        </article>
+        <article class="bg-white rounded-3xl border border-editorial-border p-6">
+          <p class="text-[11px] font-semibold tracking-widest text-editorial-accentHover">COVER & TAGS</p>
+          <h3 class="font-serif font-bold text-lg mt-2">封面大字與 Hashtag</h3>
+          <p class="text-sm text-editorial-muted mt-2 leading-relaxed">依 IG Reels、TikTok、YouTube Shorts 給封面標題和標籤，點一下就複製。</p>
+        </article>
+        <article class="bg-white rounded-3xl border border-editorial-border p-6">
+          <p class="text-[11px] font-semibold tracking-widest text-editorial-accentHover">TELEPROMPTER</p>
+          <h3 class="font-serif font-bold text-lg mt-2">手機提詞器</h3>
+          <p class="text-sm text-editorial-muted mt-2 leading-relaxed">全螢幕大字、自動捲動，速度和字級都能調，還有鏡像模式可搭配提詞支架。</p>
+        </article>
+        <article class="bg-editorial-dark text-white rounded-3xl p-6 flex flex-col justify-between">
+          <div>
+            <p class="text-[11px] font-semibold tracking-widest text-editorial-accent">FEELS REAL</p>
+            <h3 class="font-serif font-bold text-lg mt-2">口白像真人在說話</h3>
+            <p class="text-sm text-white/70 mt-2 leading-relaxed">台灣用語、自然語氣，沒有廣告腔。業配也能拍得像真心分享。</p>
+          </div>
+          <a href="/app" class="mt-5 text-sm text-editorial-accent hover:text-white transition">看範例成果 →</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- 使用步驟（真實流程，所以有編號） -->
+    <section class="max-w-5xl mx-auto px-4 pb-16">
+      <div class="bg-white rounded-3xl border border-editorial-border p-6 md:p-10">
+        <h2 class="font-serif font-bold text-2xl text-center">三步驟拍完一支</h2>
+        <ol class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+          <li class="flex gap-4">
+            <span class="font-display text-3xl text-editorial-accent leading-none">1</span>
+            <div><p class="font-semibold">填主題和重點</p><p class="text-sm text-editorial-muted mt-1 leading-relaxed">選風格、平台和長度，30 秒內填完。</p></div>
+          </li>
+          <li class="flex gap-4">
+            <span class="font-display text-3xl text-editorial-accent leading-none">2</span>
+            <div><p class="font-semibold">挑一個開場</p><p class="text-sm text-editorial-muted mt-1 leading-relaxed">看完 3 種開場，選最像你會說的那句。</p></div>
+          </li>
+          <li class="flex gap-4">
+            <span class="font-display text-3xl text-editorial-accent leading-none">3</span>
+            <div><p class="font-semibold">打開提詞器開拍</p><p class="text-sm text-editorial-muted mt-1 leading-relaxed">手機架好，照著念，畫面提示就在台詞上方。</p></div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- 方案 -->
+    <section id="pricing" class="max-w-6xl mx-auto px-4 py-12 scroll-mt-20">
+      <div class="text-center">
+        <p class="font-display italic text-editorial-accent text-sm">Pricing</p>
+        <h2 class="font-serif font-bold text-2xl md:text-4xl mt-2">一次買斷，之後都能用</h2>
+      </div>
+
+      <div class="max-w-md mx-auto mt-10 bg-white rounded-3xl border-2 border-editorial-accent shadow-lg p-7 md:p-8 relative">
+        <span class="absolute -top-3 left-1/2 -translate-x-1/2 text-[11px] bg-editorial-accent text-white px-3 py-1 rounded-full tracking-widest">終身使用</span>
+        <p class="font-serif font-bold text-xl text-center">完整版</p>
+        <div class="flex items-baseline justify-center gap-3 mt-4">
+          <span class="font-display text-5xl font-semibold tabular-nums" data-price></span>
+          <span class="text-sm text-editorial-muted line-through tabular-nums" data-original-price></span>
         </div>
-      `;
+        <p class="text-center text-xs text-editorial-muted mt-2">付一次，不用月費</p>
+        <ul class="mt-7 grid gap-3 text-sm">
+          <li class="flex gap-3"><span class="text-editorial-accent">✓</span>每天可生成 <span data-daily-limit></span> 份完整企劃</li>
+          <li class="flex gap-3"><span class="text-editorial-accent">✓</span>3 種開場、分鏡口白、CTA、封面大字、Hashtag</li>
+          <li class="flex gap-3"><span class="text-editorial-accent">✓</span>手機提詞器，可調速度、字級與鏡像</li>
+          <li class="flex gap-3"><span class="text-editorial-accent">✓</span>一鍵複製、匯出完整腳本</li>        </ul>
+        <button data-buy class="w-full mt-8 bg-editorial-dark hover:bg-editorial-accent text-white py-4 rounded-2xl transition font-medium tracking-wide">立即購買</button>
+        <p class="text-[11px] text-editorial-muted text-center mt-3 leading-relaxed">購買前請先閱讀 <a href="/terms#refund" class="underline underline-offset-2">退款政策</a></p>
+      </div>
+    </section>
 
-      scriptContent.innerHTML = html;
-    }
+    <!-- FAQ -->
+    <section class="max-w-3xl mx-auto px-4 py-14">
+      <h2 class="font-serif font-bold text-2xl text-center mb-8">常見問題</h2>
+      <div class="grid gap-3">
+        <details class="bg-white rounded-2xl border border-editorial-border p-5 group">
+          <summary class="font-semibold cursor-pointer list-none flex justify-between items-center gap-4">買斷之後真的不用再付錢嗎？<span class="text-editorial-accent group-open:rotate-45 transition">＋</span></summary>
+          <p class="text-sm text-editorial-muted mt-3 leading-relaxed">對，付一次就能一直使用。每天有 <span data-daily-limit></span> 次生成額度，隔天自動恢復，一般創作者每天拍 1 到 3 支，非常夠用。</p>
+        </details>
+        <details class="bg-white rounded-2xl border border-editorial-border p-5 group">
+          <summary class="font-semibold cursor-pointer list-none flex justify-between items-center gap-4">我不是美妝創作者也能用嗎？<span class="text-editorial-accent group-open:rotate-45 transition">＋</span></summary>
+          <p class="text-sm text-editorial-muted mt-3 leading-relaxed">可以。理財、美食、知識分享、開箱、生活 Vlog 都適用，你填什麼主題就幫你寫什麼主題。</p>
+        </details>
+        <details class="bg-white rounded-2xl border border-editorial-border p-5 group">
+          <summary class="font-semibold cursor-pointer list-none flex justify-between items-center gap-4">手機可以用嗎？<span class="text-editorial-accent group-open:rotate-45 transition">＋</span></summary>
+          <p class="text-sm text-editorial-muted mt-3 leading-relaxed">可以，整個網站都為手機設計，提詞器也是手機直接開來拍。</p>
+        </details>
+        <details class="bg-white rounded-2xl border border-editorial-border p-5 group">
+          <summary class="font-semibold cursor-pointer list-none flex justify-between items-center gap-4">付款方式有哪些？<span class="text-editorial-accent group-open:rotate-45 transition">＋</span></summary>
+          <p class="text-sm text-editorial-muted mt-3 leading-relaxed">支援信用卡與 ATM 轉帳，付款完成後帳號會自動開通。</p>
+        </details>
+      </div>
+    </section>
 
-    btnCopy.addEventListener('click', () => {
-      navigator.clipboard.writeText(currentScriptText).then(() => {
-        btnCopy.textContent = '✅ 已複製到剪貼簿';
-        setTimeout(() => { btnCopy.textContent = '📋 一鍵複製完整腳本'; }, 2000);
-      });
-    });
-  </script>
+    <!-- 收尾 CTA -->
+    <section class="max-w-6xl mx-auto px-4">
+      <div class="bg-editorial-dark text-white rounded-3xl px-6 py-12 md:py-14 text-center">
+        <p class="font-display italic text-editorial-accent">Ready when you are.</p>
+        <h2 class="font-serif font-bold text-2xl md:text-4xl mt-2">下一支影片，今天就拍</h2>
+        <div class="flex flex-wrap justify-center gap-3 mt-7">
+          <button data-buy class="bg-editorial-accent hover:bg-editorial-accentHover text-white text-sm px-7 py-3.5 rounded-full transition">立即購買 · <span data-price></span></button>
+          <a href="/app" class="border border-white/30 hover:border-white text-sm px-7 py-3.5 rounded-full transition">先看範例</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="/assets/site.js"></script>
 </body>
 </html>

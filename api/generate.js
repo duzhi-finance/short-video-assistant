@@ -1,60 +1,95 @@
+// 放在 Vercel 專案的 api/generate.js
+// 環境變數：在 Vercel 後台 Settings → Environment Variables 新增 GEMINI_API_KEY
+
+const MODEL = 'gemini-2.5-flash'; // 如果 Google 改了模型名稱，改這裡就好
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method Not Allowed' });
+    return res.status(405).json({ error: '只接受 POST' });
   }
 
-  const { topic, coreContent, style, duration } = req.body;
   const apiKey = process.env.GEMINI_API_KEY;
-
   if (!apiKey) {
-    return res.status(500).json({ error: '伺服器未設定 API Key' });
+    return res.status(500).json({ error: '後端沒有設定 GEMINI_API_KEY' });
   }
 
-  const prompt = `
-你是一位精通 Short-form (IG Reels, TikTok, YouTube Shorts) 的短影音爆款導演。
-請根據使用者需求，製作一份適合新手拍攝的結構化短影音腳本企劃。
+  const { topic, coreContent, style, duration, platform = '全平台通用' } = req.body || {};
+  if (!topic || !coreContent) {
+    return res.status(400).json({ error: '請填寫主題與核心內容' });
+  }
 
-【使用者需求】
-- 影片主題：${topic}
-- 核心內容：${coreContent}
-- 影片風格：${style}
-- 預計長度：${duration}
+  const sceneCount = duration === '60秒' ? '6 到 8' : '4 到 5';
 
-【製作原則】
-1. 開場 Hook 必須強烈（3秒內抓住注意力，使用痛點共鳴/反常識/驚喜懸念）。
-2. 口白字數需符合長度（30秒約 120-140 字，60秒約 250-280 字），語氣自然生動。
-3. 拍攝畫面需給予新手明確、具體的鏡頭視覺提示。
+  const prompt = `你是台灣的短影音企劃。請用台灣繁體中文與台灣慣用語，不要用簡體字或大陸用語。
 
-請【嚴格】僅輸出合法 JSON 格式，不可以包含任何 Markdown 格式標籤 (如 \`\`\`json )，結構如下：
+影片主題：${topic}
+核心內容：${coreContent}
+人設與風格：${style}
+影片長度：${duration}
+發布平台：${platform}
+
+要求：
+- 口白要像真人自然說話，不要有廣告腔或誇張推銷感
+- hooks 固定 3 個，type 依序為「痛點共鳴型」「反常識顛覆型」「懸念好奇型」，line 是 3 秒內講得完的開場台詞，visual 是開場畫面
+- storyboard 給 ${sceneCount} 段，每段包含 visual（鏡頭畫面與運鏡）與 audio（口白台詞）
+- 口白總長度要符合 ${duration}
+- cta 要引導觀眾留言互動，用提問製造留言動機
+- coverTitles 給 3 個封面大字，每個 12 字以內，適合 ${platform}
+- hashtags 給 6 到 8 個適合 ${platform} 的熱門與精準標籤，用空格分隔
+
+只回傳 JSON，格式如下，不要有任何其他文字：
 {
-  "title": "企劃標題",
-  "estimatedTime": "預估秒數",
-  "paceHint": "語速建議",
-  "hook": "開場第1-3秒的吸睛台詞",
-  "storyboard": [
-    {
-      "visual": "拍攝畫面/運鏡/字卡說明",
-      "audio": "對應口白台詞"
-    }
+  "title": "影片標題",
+  "estimatedTime": "${duration}",
+  "paceHint": "語速與節奏提示",
+  "hooks": [
+    { "type": "痛點共鳴型", "line": "開場台詞", "visual": "開場畫面" },
+    { "type": "反常識顛覆型", "line": "開場台詞", "visual": "開場畫面" },
+    { "type": "懸念好奇型", "line": "開場台詞", "visual": "開場畫面" }
   ],
-  "cta": "結尾引導互動台詞"
-}
-`;
+  "storyboard": [{ "visual": "畫面", "audio": "口白" }],
+  "cta": "結尾互動句",
+  "coverTitles": ["封面大字1", "封面大字2", "封面大字3"],
+  "hashtags": "#標籤1 #標籤2 #標籤3"
+}`;
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-    });
+    const aiRes = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: {
+            responseMimeType: 'application/json',
+            temperature: 0.9,
+          },
+        }),
+      }
+    );
 
-    const data = await response.json();
-    let text = data.candidates[0].content.parts[0].text;
-    text = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    
-    const parsedData = JSON.parse(text);
-    return res.status(200).json({ result: parsedData });
+    const aiData = await aiRes.json();
+    if (!aiRes.ok) {
+      return res.status(500).json({ error: aiData.error?.message || 'AI 服務出錯' });
+    }
+
+    let text = aiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // 保險：清掉可能出現的 ```json 包裝
+    text = text.replace(/```json|```/g, '').trim();
+
+    const result = JSON.parse(text);
+
+    // 檢查前端需要的欄位
+    if (!Array.isArray(result.hooks) || !Array.isArray(result.storyboard)) {
+      return res.status(500).json({ error: 'AI 回傳格式不完整，請再試一次' });
+    }
+
+    return res.status(200).json({ result });
   } catch (err) {
-    return res.status(500).json({ error: 'AI 產生企劃失敗：' + err.message });
+    return res.status(500).json({ error: '生成失敗：' + err.message });
   }
 }

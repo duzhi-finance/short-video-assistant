@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>開始企劃 · 短影音爆款企劃大師</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&family=Noto+Serif+TC:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400;1,500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/assets/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/assets/site.css">
+  <style>
+    .hook-card.is-active { border-color: #B88E52; background: #fff; box-shadow: 0 6px 20px -10px rgba(184,142,82,.55); }
+    .hook-card.is-active .hook-pick { background: #B88E52; color: #fff; border-color: #B88E52; }
+    .cover-mock { aspect-ratio: 9 / 14; max-width: 100%; }
+  </style>
+</head>
+<body data-page="app" class="antialiased min-h-screen selection:bg-editorial-accent selection:text-white">
+  <div id="site-header"></div>
+  <div class="max-w-6xl mx-auto px-4 py-10 md:py-14">
+
+    <!-- Page heading -->
+    <div class="mb-8 md:mb-10">
+      <p class="font-display italic text-editorial-accent text-sm">The Planner</p>
+      <h1 class="font-serif font-bold text-3xl md:text-4xl mt-1">開始企劃</h1>
+      <p class="text-editorial-muted text-sm mt-2">右邊先放了一份範例，填好左邊再按生成，就會換成你的企劃。</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
+
+      <!-- Left: Form -->
+      <section class="lg:col-span-5 lg:sticky lg:top-6 bg-white p-6 md:p-7 rounded-3xl border border-editorial-border shadow-sm">
+        <div class="flex justify-between items-baseline mb-5 pb-3 border-b border-editorial-border/70">
+          <div>
+            <p class="font-display italic text-editorial-accent text-xs">Brief</p>
+            <h2 class="font-serif text-xl font-bold">企劃需求設定</h2>
+          </div>
+          <button id="btnPreset" type="button" class="text-xs text-editorial-accent hover:text-editorial-accentHover font-medium underline-offset-4 hover:underline">✦ 換一組範例</button>
+        </div>
+
+        <form id="planForm" class="space-y-4">
+          <div>
+            <label class="block text-[11px] font-semibold text-editorial-muted mb-1.5 tracking-widest">影片主題 / 標題方向</label>
+            <input type="text" id="topic" required placeholder="例如：新手必看的 3 個抗老保養誤區" class="w-full text-sm p-3.5 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none transition">
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-semibold text-editorial-muted mb-1.5 tracking-widest">想傳達的核心內容 / 乾貨</label>
+            <textarea id="coreContent" rows="3" required placeholder="例如：打破貴就是好的迷思、解析成分濃度、分享正確疊擦順序" class="w-full text-sm p-3.5 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none transition leading-relaxed"></textarea>
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-[11px] font-semibold text-editorial-muted mb-1.5 tracking-widest">人設與風格</label>
+              <select id="style" class="w-full text-sm p-3.5 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none">
+                <option value="質感美學/輕溫柔分享">質感美學 / 溫柔分享</option>
+                <option value="專業幹練/乾貨滿滿">專業幹練 / 乾貨滿滿</option>
+                <option value="幽默風趣/接地氣共鳴">幽默風趣 / 接地氣</option>
+                <option value="高級冷感/沉浸式隨手記">高級冷感 / 沉浸式</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-[11px] font-semibold text-editorial-muted mb-1.5 tracking-widest">發布平台</label>
+              <select id="platform" class="w-full text-sm p-3.5 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none">
+                <option value="IG Reels">IG Reels</option>
+                <option value="TikTok">TikTok</option>
+                <option value="YouTube Shorts">YouTube Shorts</option>
+                <option value="全平台通用">全平台通用</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[11px] font-semibold text-editorial-muted mb-1.5 tracking-widest">預計影片長度</label>
+            <div class="grid grid-cols-2 gap-3">
+              <label class="flex items-center justify-center p-3 rounded-2xl border border-editorial-border bg-editorial-bg/60 cursor-pointer text-xs font-medium transition has-[:checked]:border-editorial-accent has-[:checked]:bg-editorial-card has-[:checked]:text-editorial-accentHover">
+                <input type="radio" name="duration" value="30秒" checked class="sr-only"> 30 秒 · 極速爆款
+              </label>
+              <label class="flex items-center justify-center p-3 rounded-2xl border border-editorial-border bg-editorial-bg/60 cursor-pointer text-xs font-medium transition has-[:checked]:border-editorial-accent has-[:checked]:bg-editorial-card has-[:checked]:text-editorial-accentHover">
+                <input type="radio" name="duration" value="60秒" class="sr-only"> 60 秒 · 深度乾貨
+              </label>
+            </div>
+          </div>
+
+          <button type="submit" id="btnSubmit" class="w-full mt-2 py-4 bg-editorial-dark hover:bg-editorial-accent text-white font-medium text-sm rounded-2xl transition shadow-md tracking-wider disabled:opacity-60">
+            ✦ 立即生成爆款企劃
+          </button>
+          <p id="formNote" class="hidden text-xs leading-relaxed text-editorial-accentHover bg-editorial-card border border-editorial-border rounded-2xl p-3"></p>
+        </form>
+      </section>
+
+      <!-- Right: Result -->
+      <section class="lg:col-span-7">
+
+        <div id="loadingState" class="hidden bg-white p-12 rounded-3xl border border-editorial-border text-center min-h-[420px] flex flex-col items-center justify-center">
+          <div class="w-8 h-8 border-2 border-editorial-accent border-t-transparent rounded-full animate-spin mb-4"></div>
+          <p class="font-serif text-lg font-semibold">正在撰寫你的爆款企劃…</p>
+          <p class="text-editorial-muted text-xs mt-1">安排開場、分鏡與結尾節奏中</p>
+        </div>
+
+        <div id="resultState" class="space-y-5">
+          <!-- Action bar -->
+          <div class="flex flex-wrap gap-2 justify-between items-center bg-white px-4 py-3 rounded-2xl border border-editorial-border shadow-sm">
+            <span id="scriptBadge" class="text-[11px] font-semibold px-3 py-1 bg-editorial-card text-editorial-accentHover rounded-full border border-editorial-border">範例預覽</span>
+            <div class="flex items-center gap-2">
+              <button id="btnTeleprompter" class="text-xs bg-editorial-bg border border-editorial-border px-3 py-2 rounded-xl hover:border-editorial-accent transition font-medium">🎙️ 提詞器</button>
+              <button id="btnDownload" class="text-xs bg-editorial-bg border border-editorial-border px-3 py-2 rounded-xl hover:border-editorial-accent transition font-medium">⤓ 匯出</button>
+              <button id="btnCopy" class="text-xs bg-editorial-dark text-white px-3.5 py-2 rounded-xl hover:bg-editorial-accent transition font-medium">📋 複製腳本</button>
+            </div>
+          </div>
+
+          <article id="scriptContent" class="bg-white p-6 md:p-8 rounded-3xl border border-editorial-border shadow-sm space-y-9"></article>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <!-- Teleprompter -->
+  <div id="teleprompter" class="fixed inset-0 z-50 hidden bg-[#141110] text-[#F6EFE4] flex flex-col">
+    <div class="flex items-center justify-between px-4 py-3 border-b border-white/10">
+      <p class="font-display italic text-editorial-accent text-sm">Teleprompter</p>
+      <button id="btnCloseTp" class="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center">✕</button>
+    </div>
+
+    <div class="relative flex-1 overflow-hidden">
+      <div class="pointer-events-none absolute inset-x-0 top-1/3 h-px bg-editorial-accent/50 z-10"></div>
+      <div class="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#141110] to-transparent z-10"></div>
+      <div class="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#141110] to-transparent z-10"></div>
+      <div id="tpScroll" class="no-scrollbar h-full overflow-y-auto px-6">
+        <div id="tpText" class="max-w-3xl mx-auto text-center font-serif leading-[1.7]" style="padding:33vh 0 70vh"></div>
+      </div>
+    </div>
+
+    <div class="px-4 py-4 border-t border-white/10 bg-[#1C1816]">
+      <div class="max-w-3xl mx-auto flex flex-wrap items-center gap-x-6 gap-y-3 justify-center text-xs">
+        <button id="tpPlay" class="px-6 py-2.5 rounded-full bg-editorial-accent hover:bg-editorial-accentHover text-white font-medium text-sm">▶ 開始</button>
+        <button id="tpRestart" class="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20">↺ 從頭</button>
+        <label class="flex items-center gap-2">速度 <input id="tpSpeed" type="range" min="10" max="140" value="45" class="w-24"></label>
+        <label class="flex items-center gap-2">字級 <input id="tpSize" type="range" min="22" max="64" value="34" class="w-24"></label>
+        <label class="flex items-center gap-2 cursor-pointer"><input id="tpMirror" type="checkbox" class="accent-[#B88E52]"> 鏡像</label>
+      </div>
+    </div>
+  </div>
+
+  <script src="/assets/site.js"></script>
+  <script>
+    /* ---------- 範例資料 ---------- */
+    const PRESETS = [
+      {
+        input: { topic: '新手 3 分鐘搞定高級感偽素顏底妝', coreContent: '告別厚重面具感！分享妝前保濕急救、粉底減量拍勻法、以及局部精準遮瑕定妝的秘密。', style: '質感美學/輕溫柔分享', platform: 'IG Reels', duration: '30秒' },
+        result: {
+          title: '偽素顏的秘密，是「少擦」不是「多擦」',
+          estimatedTime: '30秒',
+          paceHint: '語速放慢、句尾帶笑，像在跟閨蜜分享',
+          hooks: [
+            { type: '痛點共鳴型', line: '妳是不是也這樣？底妝越擦越厚，中午就開始卡粉。', visual: '近拍鼻翼卡粉的特寫，輕嘆一口氣' },
+            { type: '反常識顛覆型', line: '想要好皮感，粉底請先少擠一半。', visual: '把粉底擠到手背，再刮掉一半' },
+            { type: '懸念好奇型', line: '我朋友以為我沒化妝，其實我只做了三件事。', visual: '素顏與完妝快速對切，比出「3」' }
+          ],
+          storyboard: [
+            { visual: '洗完臉後拍上化妝水，按壓肌膚的近景', audio: '底妝服不服貼，其實從保濕就決定了。先用化妝水按壓到肌膚微微吸手。' },
+            { visual: '粉底點在兩頰與額頭，只用黃豆大小', audio: '粉底只要黃豆大小，點在臉部中間就好。' },
+            { visual: '濕海綿由內往外輕拍，慢動作', audio: '用濕海綿從內往外拍開，邊緣自然就會變薄，不會有面具線。' },
+            { visual: '細刷沾遮瑕點在痘印與眼下', audio: '有瑕疵的地方才局部遮瑕，整張臉才會看起來是「皮膚好」。' },
+            { visual: '用粉撲只按壓 T 字部位，轉身面對自然光', audio: '最後只定 T 字，臉頰留一點光澤，這樣就完成了。' }
+          ],
+          cta: '妳平常底妝最困擾的是卡粉還是脫妝？留言告訴我，下一支幫妳解決。',
+          coverTitles: ['少擦一半，皮膚更好', '偽素顏只做三件事', '底妝卡粉？先看這支'],
+          hashtags: '#偽素顏 #底妝教學 #新手化妝 #美妝分享 #化妝技巧 #reels'
+        }
+      },
+      {
+        input: { topic: '月光族的 3 個存錢小習慣', coreContent: '不用硬省，靠自動轉帳、記帳只記三大類、延遲 48 小時購物，讓存錢變自然。', style: '專業幹練/乾貨滿滿', platform: 'TikTok', duration: '60秒' },
+        result: {
+          title: '存不到錢不是你不努力，是方法不對',
+          estimatedTime: '60秒',
+          paceHint: '語速中等偏快，重點句停半拍',
+          hooks: [
+            { type: '痛點共鳴型', line: '每個月都說要存錢，月底還是剩下零？', visual: '打開存摺 App 餘額畫面，表情無奈' },
+            { type: '反常識顛覆型', line: '想存錢，第一步不是省錢。', visual: '把「省錢」兩個字劃掉的手寫特寫' },
+            { type: '懸念好奇型', line: '我靠這三個習慣，一年默默多存了一筆旅費。', visual: '手上拿機票，鏡頭推近' }
+          ],
+          storyboard: [
+            { visual: '手機設定自動轉帳畫面', audio: '第一個，發薪日當天自動轉一筆到另一個戶頭，看不到就不會花。' },
+            { visual: '記帳本只畫三個欄位', audio: '第二個，記帳不用每筆都記，只分「必要、想要、存起來」三類。' },
+            { visual: '購物車畫面，手指停在結帳鍵上', audio: '第三個，想買的東西先放購物車 48 小時，過了還想要再買。' },
+            { visual: '三個習慣字卡依序排好', audio: '這三個都不用靠意志力，設定好就會自己運作。' }
+          ],
+          cta: '你最常衝動買的是什麼？留言跟我說，我幫你想替代方案。',
+          coverTitles: ['存錢第一步不是省錢', '月光族救星三習慣'],
+          hashtags: '#存錢 #理財新手 #月光族 #理財習慣 #生活乾貨 #fyp'
+        }
+      }
+    ];
+
+    /* ---------- 元素 ---------- */
+    const $ = id => document.getElementById(id);
+    const planForm = $('planForm'), loadingState = $('loadingState'), resultState = $('resultState');
+    const scriptContent = $('scriptContent'), scriptBadge = $('scriptBadge'), formNote = $('formNote');
+
+    let currentData = null;
+    let selectedHook = 0;
+    let presetIndex = 0;
+
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    /* 讓不同格式的 AI 回傳都能顯示 */
+    function normalize(d) {
+      const types = ['痛點共鳴型', '反常識顛覆型', '懸念好奇型'];
+      const hooks = (d.hooks || []).map((h, i) => typeof h === 'string'
+        ? { type: types[i] || '開場', line: h, visual: '' }
+        : { type: h.type || types[i] || '開場', line: h.line || h.text || '', visual: h.visual || '' });
+      let tags = Array.isArray(d.hashtags) ? d.hashtags.join(' ') : (d.hashtags || '');
+      const covers = Array.isArray(d.coverTitles) ? d.coverTitles : (d.coverTitle ? [d.coverTitle] : []);
+      return {
+        title: d.title || '', estimatedTime: d.estimatedTime || '', paceHint: d.paceHint || '',
+        hooks, storyboard: Array.isArray(d.storyboard) ? d.storyboard : [],
+        cta: d.cta || '', coverTitles: covers, hashtags: tags.trim()
+      };
+    }
+
+    function fillForm(input) {
+      $('topic').value = input.topic;
+      $('coreContent').value = input.coreContent;
+      $('style').value = input.style;
+      $('platform').value = input.platform;
+      document.querySelector(`input[name="duration"][value="${input.duration}"]`).checked = true;
+    }
+
+    /* ---------- 渲染 ---------- */
+    function sectionHead(no, en, zh) {
+      return `<div class="flex items-baseline gap-3 mb-4">
+        <span class="font-display text-2xl text-editorial-accent leading-none">${no}</span>
+        <div><p class="font-display italic text-[11px] text-editorial-muted leading-none">${en}</p>
+        <h4 class="font-serif font-bold text-base mt-1">${zh}</h4></div></div>`;
+    }
+
+    function render(data) {
+      const d = data;
+      let html = `
+        <header class="fade-in">
+          <p class="font-display italic text-editorial-accent text-xs">The Script</p>
+          <h3 class="font-serif font-bold text-2xl md:text-3xl leading-snug mt-1">${esc(d.title)}</h3>
+          <div class="flex flex-wrap gap-2 mt-3 text-[11px] text-editorial-muted">
+            <span class="px-2.5 py-1 rounded-full bg-editorial-bg border border-editorial-border">⏱ ${esc(d.estimatedTime)}</span>
+            <span class="px-2.5 py-1 rounded-full bg-editorial-bg border border-editorial-border">🗣 ${esc(d.paceHint)}</span>
+          </div>
+          <div class="rule mt-6"></div>
+        </header>
+
+        <section class="fade-in">
+          ${sectionHead('01', 'Golden 3 Seconds · A/B Test', '黃金 3 秒 Hook 開場')}
+          <p class="text-xs text-editorial-muted -mt-2 mb-3">點選一個作為正式開場，提詞器與複製腳本會跟著使用。</p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+            ${d.hooks.map((h, i) => `
+              <button type="button" data-hook="${i}" class="hook-card ${i === selectedHook ? 'is-active' : ''} text-left p-4 rounded-2xl bg-editorial-bg border border-editorial-border hover:border-editorial-accent transition flex flex-col gap-2">
+                <div class="flex items-center justify-between">
+                  <span class="text-[10px] font-semibold tracking-widest text-editorial-accentHover">${String.fromCharCode(65 + i)} · ${esc(h.type)}</span>
+                  <span class="hook-pick text-[10px] px-2 py-0.5 rounded-full border border-editorial-border text-editorial-muted">${i === selectedHook ? '使用中' : '選用'}</span>
+                </div>
+                <p class="font-serif text-[15px] font-semibold leading-relaxed">「${esc(h.line)}」</p>
+                ${h.visual ? `<p class="text-[11px] text-editorial-muted leading-relaxed">🎥 ${esc(h.visual)}</p>` : ''}
+              </button>`).join('')}
+          </div>
+        </section>
+
+        <section class="fade-in">
+          ${sectionHead('02', 'Storyboard', '視覺與口白分鏡軌')}
+          <div class="rounded-2xl border border-editorial-border overflow-hidden">
+            <div class="hidden md:grid grid-cols-12 bg-editorial-card text-[11px] font-semibold tracking-widest text-editorial-muted">
+              <div class="col-span-1 px-3 py-2.5 text-center">#</div>
+              <div class="col-span-5 px-3 py-2.5 border-l border-editorial-border">鏡頭視覺 / 運鏡提示</div>
+              <div class="col-span-6 px-3 py-2.5 border-l border-editorial-border">口白台詞</div>
+            </div>
+            ${d.storyboard.map((s, i) => `
+              <div class="grid grid-cols-1 md:grid-cols-12 border-t border-editorial-border first:border-t-0 md:first:border-t ${i % 2 ? 'bg-editorial-bg/50' : 'bg-white'}">
+                <div class="md:col-span-1 px-3 pt-3 md:py-3.5 flex md:justify-center">
+                  <span class="font-display text-lg text-editorial-accent">${String(i + 1).padStart(2, '0')}</span>
+                </div>
+                <div class="md:col-span-5 px-3 py-1.5 md:py-3.5 md:border-l border-editorial-border text-xs text-editorial-muted leading-relaxed">
+                  <span class="md:hidden font-semibold text-editorial-accentHover">🎥 </span>${esc(s.visual)}
+                </div>
+                <div class="md:col-span-6 px-3 pb-3.5 pt-1 md:py-3.5 md:border-l border-editorial-border text-[13px] font-medium leading-relaxed">
+                  <span class="md:hidden font-semibold text-editorial-dark">🗣 </span>${esc(s.audio)}
+                </div>
+              </div>`).join('')}
+          </div>
+        </section>
+
+        <section class="fade-in">
+          ${sectionHead('03', 'Emotional Call to Action', '情緒 CTA 結尾')}
+          <blockquote class="relative bg-editorial-card border border-editorial-border rounded-2xl p-5 pl-7">
+            <span class="absolute left-3 top-2 font-display text-4xl text-editorial-accent/50 leading-none">“</span>
+            <p class="font-serif text-[15px] font-semibold leading-relaxed">${esc(d.cta)}</p>
+          </blockquote>
+        </section>
+
+        <section class="fade-in">
+          ${sectionHead('04', 'Cover & Hashtags', '封面大字與熱門標籤')}
+          ${d.coverTitles.length ? `
+          <div class="grid grid-cols-3 gap-3 mb-4">
+            ${d.coverTitles.slice(0, 3).map((c, i) => `
+              <button type="button" data-copy="${esc(c)}" class="cover-mock rounded-2xl overflow-hidden relative text-left group ${['bg-editorial-dark', 'bg-editorial-oat', 'bg-editorial-accent'][i % 3]}">
+                <div class="absolute inset-0 p-3 flex flex-col justify-end">
+                  <p class="font-serif font-black text-base md:text-xl leading-tight ${i % 3 === 1 ? 'text-editorial-dark' : 'text-white'}" style="font-weight:900">${esc(c)}</p>
+                  <span class="mt-2 text-[10px] opacity-0 group-hover:opacity-100 transition ${i % 3 === 1 ? 'text-editorial-muted' : 'text-white/80'}">點一下複製</span>
+                </div>
+              </button>`).join('')}
+          </div>` : ''}
+          <div class="flex flex-wrap gap-2">
+            ${d.hashtags.split(/\s+/).filter(Boolean).map(t => `
+              <button type="button" data-copy="${esc(t)}" class="text-xs px-3 py-1.5 rounded-full bg-editorial-bg border border-editorial-border hover:border-editorial-accent transition">${esc(t)}</button>`).join('')}
+            <button type="button" data-copy="${esc(d.hashtags)}" class="text-xs px-3 py-1.5 rounded-full bg-editorial-dark text-white hover:bg-editorial-accent transition">全部複製</button>
+          </div>
+        </section>
+      `;
+      scriptContent.innerHTML = html;
+    }
+
+    function showResult(raw, isDemo) {
+      currentData = normalize(raw);
+      selectedHook = 0;
+      render(currentData);
+      scriptBadge.textContent = isDemo ? '範例預覽' : '✦ 企劃完成';
+      loadingState.classList.add('hidden');
+      resultState.classList.remove('hidden');
+    }
+
+    /* ---------- 互動 ---------- */
+    scriptContent.addEventListener('click', e => {
+      const hookBtn = e.target.closest('[data-hook]');
+      if (hookBtn) {
+        selectedHook = Number(hookBtn.dataset.hook);
+        render(currentData);
+        return;
+      }
+      const copyBtn = e.target.closest('[data-copy]');
+      if (copyBtn) copyText(copyBtn.dataset.copy, '已複製');
+    });
+
+    function copyText(text, msg) {
+      navigator.clipboard.writeText(text).then(() => toast(msg)).catch(() => toast('複製失敗，請手動選取'));
+    }
+
+    function buildScriptText() {
+      const d = currentData;
+      const h = d.hooks[selectedHook];
+      return [
+        `【短影音企劃書】${d.title}`,
+        `時長：${d.estimatedTime}｜節奏：${d.paceHint}`,
+        '',
+        '【正式開場】',
+        h ? `${h.type}：${h.line}${h.visual ? `\n畫面：${h.visual}` : ''}` : '',
+        '',
+        '【其他開場備選】',
+        ...d.hooks.filter((_, i) => i !== selectedHook).map(x => `${x.type}：${x.line}`),
+        '',
+        '【分鏡腳本】',
+        ...d.storyboard.map((s, i) => `${i + 1}. 畫面：${s.visual}\n   口白：${s.audio}`),
+        '',
+        '【結尾 CTA】',
+        d.cta,
+        '',
+        '【封面大字】',
+        ...d.coverTitles,
+        '',
+        '【Hashtags】',
+        d.hashtags
+      ].join('\n');
+    }
+
+    $('btnCopy').addEventListener('click', () => currentData && copyText(buildScriptText(), '完整腳本已複製'));
+
+    $('btnDownload').addEventListener('click', () => {
+      if (!currentData) return;
+      const blob = new Blob([buildScriptText()], { type: 'text/plain;charset=utf-8' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `${currentData.title.slice(0, 20) || '短影音企劃'}.txt`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+
+    $('btnPreset').addEventListener('click', () => {
+      presetIndex = (presetIndex + 1) % PRESETS.length;
+      fillForm(PRESETS[presetIndex].input);
+      showResult(PRESETS[presetIndex].result, true);
+      formNote.classList.add('hidden');
+    });
+
+    planForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const payload = {
+        topic: $('topic').value.trim(),
+        coreContent: $('coreContent').value.trim(),
+        style: $('style').value,
+        platform: $('platform').value,
+        duration: document.querySelector('input[name="duration"]:checked').value
+      };
+
+      formNote.classList.add('hidden');
+      resultState.classList.add('hidden');
+      loadingState.classList.remove('hidden');
+      $('btnSubmit').disabled = true;
+
+      try {
+        const res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        let data;
+        try { data = await res.json(); } catch { throw new Error('伺服器沒有回應，請稍後再試'); }
+        if (!res.ok) throw new Error(data.error || '生成失敗');
+        showResult(data.result, false);
+        if (window.innerWidth < 1024) resultState.scrollIntoView({ behavior: 'smooth' });
+      } catch (err) {
+        loadingState.classList.add('hidden');
+        resultState.classList.remove('hidden');
+        formNote.textContent = '生成沒有成功：' + err.message + '（目前先顯示原本的內容）';
+        formNote.classList.remove('hidden');
+      } finally {
+        $('btnSubmit').disabled = false;
+      }
+    });
+
+    /* ---------- 提詞器 ---------- */
+    const tp = $('teleprompter'), tpScroll = $('tpScroll'), tpText = $('tpText');
+    let tpPlaying = false, tpLast = 0, tpPos = 0;
+
+    function openPrompter() {
+      if (!currentData) return;
+      const d = currentData;
+      const h = d.hooks[selectedHook];
+      const block = (label, text) => `
+        <div class="mb-14">
+          <p class="text-[13px] font-sans tracking-widest text-editorial-accent/80 mb-3">${esc(label)}</p>
+          <p class="font-semibold">${esc(text)}</p>
+        </div>`;
+      tpText.innerHTML =
+        (h ? block('開場 · ' + h.type, h.line) : '') +
+        d.storyboard.map((s, i) => block(`${String(i + 1).padStart(2, '0')} · ${s.visual}`, s.audio)).join('') +
+        block('結尾', d.cta);
+      applyTpSettings();
+      tp.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      tpScroll.scrollTop = 0; tpPos = 0;
+    }
+
+    function applyTpSettings() {
+      tpText.style.fontSize = $('tpSize').value + 'px';
+      tpText.style.transform = $('tpMirror').checked ? 'scaleX(-1)' : 'none';
+    }
+
+    function tpStep(t) {
+      if (!tpPlaying) return;
+      if (tpLast) {
+        tpPos += Number($('tpSpeed').value) * (t - tpLast) / 1000;
+        tpScroll.scrollTop = tpPos;
+        if (tpScroll.scrollTop + tpScroll.clientHeight >= tpScroll.scrollHeight - 2) { setPlaying(false); return; }
+      }
+      tpLast = t;
+      requestAnimationFrame(tpStep);
+    }
+
+    function setPlaying(on) {
+      tpPlaying = on;
+      tpLast = 0;
+      tpPos = tpScroll.scrollTop;
+      $('tpPlay').textContent = on ? '❚❚ 暫停' : '▶ 開始';
+      if (on) requestAnimationFrame(tpStep);
+    }
+
+    $('btnTeleprompter').addEventListener('click', openPrompter);
+    $('tpPlay').addEventListener('click', () => setPlaying(!tpPlaying));
+    $('tpRestart').addEventListener('click', () => { tpScroll.scrollTop = 0; tpPos = 0; });
+    $('tpSize').addEventListener('input', applyTpSettings);
+    $('tpMirror').addEventListener('change', applyTpSettings);
+    tpScroll.addEventListener('scroll', () => { if (!tpPlaying) tpPos = tpScroll.scrollTop; });
+    $('btnCloseTp').addEventListener('click', () => {
+      setPlaying(false);
+      tp.classList.add('hidden');
+      document.body.style.overflow = '';
+    });
+
+    /* ---------- 開啟時先帶入範例 ---------- */
+    fillForm(PRESETS[0].input);
+    showResult(PRESETS[0].result, true);
+  </script>
+  <div id="site-footer"></div>
+</body>
+</html>
