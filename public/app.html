@@ -83,13 +83,20 @@
 
         <form id="planForm" class="space-y-4">
           <div>
-            <label class="block text-[11px] font-semibold text-editorial-muted mb-1.5 tracking-widest">影片主題 / 標題方向</label>
-            <input type="text" id="topic" required placeholder="例如：新手必看的 3 個抗老保養誤區" class="w-full text-sm p-3.5 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none transition">
+            <label for="topic" class="block text-[11px] font-semibold text-editorial-muted mb-1.5 tracking-widest">想拍什麼？一句話就好</label>
+            <input type="text" id="topic" placeholder="例如：底妝、存錢、租屋、減脂便當" class="w-full text-sm p-3.5 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none transition">
           </div>
 
           <div>
-            <label class="block text-[11px] font-semibold text-editorial-muted mb-1.5 tracking-widest">想傳達的核心內容 / 乾貨</label>
-            <textarea id="coreContent" rows="3" required placeholder="例如：打破貴就是好的迷思、解析成分濃度、分享正確疊擦順序" class="w-full text-sm p-3.5 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none transition leading-relaxed"></textarea>
+            <label for="coreContent" class="block text-[11px] font-semibold text-editorial-muted mb-1.5 tracking-widest">你最直覺的抱怨，或顧客最常問的問題</label>
+            <textarea id="coreContent" rows="3" placeholder="例如：粉底每次到下午就浮粉卡粉，補妝越補越髒" class="w-full text-sm p-3.5 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none transition leading-relaxed"></textarea>
+            <p class="text-[11px] text-editorial-muted mt-2 leading-relaxed">不用寫得很完整，用你平常講話的方式寫就好，AI 會幫你翻成有共鳴的拍攝角度。</p>
+            <div class="flex flex-wrap gap-1.5 mt-2" id="ideaChips">
+              <button type="button" data-idea="底妝|粉底每次到下午就浮粉卡粉，補妝越補越髒" class="text-[11px] px-2.5 py-1 rounded-full bg-editorial-bg border border-editorial-border hover:border-editorial-accent transition">下午就浮粉卡粉</button>
+              <button type="button" data-idea="保養|買了一堆保養品，臉還是一直冒痘，到底哪裡錯" class="text-[11px] px-2.5 py-1 rounded-full bg-editorial-bg border border-editorial-border hover:border-editorial-accent transition">保養越擦越冒痘</button>
+              <button type="button" data-idea="存錢|每個月都說要存錢，月底還是剩零" class="text-[11px] px-2.5 py-1 rounded-full bg-editorial-bg border border-editorial-border hover:border-editorial-accent transition">月底永遠剩零</button>
+              <button type="button" data-idea="開店|客人都問「有沒有比較便宜的」" class="text-[11px] px-2.5 py-1 rounded-full bg-editorial-bg border border-editorial-border hover:border-editorial-accent transition">客人一直殺價</button>
+            </div>
           </div>
 
           <div class="grid grid-cols-2 gap-3">
@@ -190,44 +197,46 @@
     /* ---------- 範例資料 ---------- */
     const PRESETS = [
       {
-        input: { topic: '新手 3 分鐘搞定高級感偽素顏底妝', coreContent: '告別厚重面具感！分享妝前保濕急救、粉底減量拍勻法、以及局部精準遮瑕定妝的秘密。', style: '質感美學/輕溫柔分享', platform: 'IG Reels', duration: '30秒' },
+        input: { topic: '底妝', coreContent: '粉底每次到下午就浮粉卡粉，補妝越補越髒', style: '質感美學/輕溫柔分享', platform: 'IG Reels', duration: '30秒' },
         result: {
+          angle: '拍給上班族：早上妝很美、下午鼻翼就卡粉，問題其實出在擦太多和保濕沒等吸收',
           title: '偽素顏的秘密，是「少擦」不是「多擦」',
           estimatedTime: '30秒',
-          paceHint: '語速放慢、句尾帶笑，像在跟閨蜜分享',
+          paceHint: '語速放慢、句尾帶笑，像下班後跟好朋友吐苦水',
           hooks: [
-            { type: '痛點共鳴型', line: '妳是不是也這樣？底妝越擦越厚，中午就開始卡粉。', visual: '近拍鼻翼卡粉的特寫，輕嘆一口氣' },
-            { type: '反常識顛覆型', line: '想要好皮感，粉底請先少擠一半。', visual: '把粉底擠到手背，再刮掉一半' },
-            { type: '懸念好奇型', line: '我朋友以為我沒化妝，其實我只做了三件事。', visual: '素顏與完妝快速對切，比出「3」' }
+            { type: '血淚控訴型', line: '你如果也是擦完保養馬上上粉底，難怪下午鼻子卡成這樣…', visual: '手機架胸口高度，近拍鼻翼卡粉，手指輕點那塊' },
+            { type: '反常識打臉型', line: '誰跟你粉底要擠一整泵？難怪不到三點就浮粉！', visual: '一整泵粉底擠在手背，再用刮棒刮掉一半，字卡：「這樣就夠」' },
+            { type: '閨蜜真心話型', line: '拜託，真心勸你，先別急著換粉底，聽我講完這三步…', visual: '正面看鏡頭、身體微微前傾，比出「3」' }
           ],
           storyboard: [
-            { visual: '洗完臉後拍上化妝水，按壓肌膚的近景', audio: '底妝服不服貼，其實從保濕就決定了。先用化妝水按壓到肌膚微微吸手。' },
-            { visual: '粉底點在兩頰與額頭，只用黃豆大小', audio: '粉底只要黃豆大小，點在臉部中間就好。' },
-            { visual: '濕海綿由內往外輕拍，慢動作', audio: '用濕海綿從內往外拍開，邊緣自然就會變薄，不會有面具線。' },
-            { visual: '細刷沾遮瑕點在痘印與眼下', audio: '有瑕疵的地方才局部遮瑕，整張臉才會看起來是「皮膚好」。' },
-            { visual: '用粉撲只按壓 T 字部位，轉身面對自然光', audio: '最後只定 T 字，臉頰留一點光澤，這樣就完成了。' }
+            { visual: '擦完化妝水，手掌整個蓋住臉頰按壓，畫面角落放計時器字卡「等 3 分鐘」', audio: '第一步，保養擦完先等三分鐘，摸起來不黏手再上妝。保濕沒吃進去，粉底一定浮。' },
+            { visual: '近拍手背上一顆黃豆大小的粉底，旁邊字卡「黃豆大小」', audio: '第二步，粉底只要黃豆大，點在兩頰和額頭，臉的外圈不用另外擦。' },
+            { visual: '濕海綿從鼻翼旁往外拍，鏡頭跟著手移動，慢動作', audio: '用濕海綿從臉中間往外「拍」，不要用抹的。邊緣自然變薄，就不會有面具線。' },
+            { visual: '細刷點在痘印和眼下，再用指腹輕壓三下', audio: '有瑕疵的地方才遮。全臉都厚，看起來就是妝很重，不是皮膚好。' },
+            { visual: '粉撲只按壓 T 字，轉頭面對窗邊自然光，字卡：「下午三點也不卡」', audio: '最後只定 T 字，臉頰留一點光。記住，底妝是減法，不是加法。' }
           ],
-          cta: '妳平常底妝最困擾的是卡粉還是脫妝？留言告訴我，下一支幫妳解決。',
+          cta: '你下午最先垮的是鼻子還是法令紋？留言跟我說，下一支專門幫你救那一塊。',
           coverTitles: ['少擦一半，皮膚更好', '偽素顏只做三件事', '底妝卡粉？先看這支'],
           hashtags: '#偽素顏 #底妝教學 #新手化妝 #美妝分享 #化妝技巧 #reels'
         }
       },
       {
-        input: { topic: '月光族的 3 個存錢小習慣', coreContent: '不用硬省，靠自動轉帳、記帳只記三大類、延遲 48 小時購物，讓存錢變自然。', style: '專業幹練/乾貨滿滿', platform: 'TikTok', duration: '60秒' },
+        input: { topic: '存錢', coreContent: '每個月都說要存錢，月底還是剩零', style: '專業幹練/乾貨滿滿', platform: 'TikTok', duration: '60秒' },
         result: {
-          title: '存不到錢不是你不努力，是方法不對',
+          angle: '拍給剛出社會的月光族：不是你不夠省，是你把存錢放在「花剩的」最後一步',
+          title: '存不到錢不是你不努力，是順序錯了',
           estimatedTime: '60秒',
-          paceHint: '語速中等偏快，重點句停半拍',
+          paceHint: '語速中等偏快，重點句前停半拍，語氣像學姊直接點醒你',
           hooks: [
-            { type: '痛點共鳴型', line: '每個月都說要存錢，月底還是剩下零？', visual: '打開存摺 App 餘額畫面，表情無奈' },
-            { type: '反常識顛覆型', line: '想存錢，第一步不是省錢。', visual: '把「省錢」兩個字劃掉的手寫特寫' },
-            { type: '懸念好奇型', line: '我靠這三個習慣，一年默默多存了一筆旅費。', visual: '手上拿機票，鏡頭推近' }
+            { type: '血淚控訴型', line: '你如果也是月底才看剩多少再存，難怪永遠存不到…', visual: '打開網銀 App，餘額三位數，鏡頭停兩秒' },
+            { type: '反常識打臉型', line: '誰跟你存錢要先省錢？順序搞錯，省再多都沒用！', visual: '在紙上寫「省錢」，用紅筆大力劃掉' },
+            { type: '閨蜜真心話型', line: '拜託，剛出社會的真的聽我一句，這三件事今天就去設定…', visual: '坐在床邊直視鏡頭，手上拿著手機晃一下' }
           ],
           storyboard: [
-            { visual: '手機設定自動轉帳畫面', audio: '第一個，發薪日當天自動轉一筆到另一個戶頭，看不到就不會花。' },
-            { visual: '記帳本只畫三個欄位', audio: '第二個，記帳不用每筆都記，只分「必要、想要、存起來」三類。' },
-            { visual: '購物車畫面，手指停在結帳鍵上', audio: '第三個，想買的東西先放購物車 48 小時，過了還想要再買。' },
-            { visual: '三個習慣字卡依序排好', audio: '這三個都不用靠意志力，設定好就會自己運作。' }
+            { visual: '近拍手機設定「發薪日自動轉帳」的畫面，字卡：「先存，再花」', audio: '第一件事，發薪日當天自動轉一筆到另一個戶頭。先存再花，看不到的錢就不會被你花掉。' },
+            { visual: '筆記本畫三個大格子，寫「必要／想要／存起來」', audio: '第二件事，記帳不用每筆都記，只分三類就好。月底看「想要」那格，你就知道錢漏在哪。' },
+            { visual: '購物車畫面，手指停在結帳鍵上，畫面跳出字卡「48 小時」', audio: '第三件事，想買的東西先放購物車兩天。兩天後還想要再買，衝動消費會少一大半。' },
+            { visual: '三個字卡依序排好，鏡頭往後拉', audio: '這三件都不用靠意志力，設定一次，它就自己幫你存。' }
           ],
           cta: '你最常衝動買的是什麼？留言跟我說，我幫你想替代方案。',
           coverTitles: ['存錢第一步不是省錢', '月光族救星三習慣'],
@@ -249,13 +258,19 @@
 
     /* 讓不同格式的 AI 回傳都能顯示 */
     function normalize(d) {
-      const types = ['痛點共鳴型', '反常識顛覆型', '懸念好奇型'];
-      const hooks = (d.hooks || []).map((h, i) => typeof h === 'string'
-        ? { type: types[i] || '開場', line: h, visual: '' }
-        : { type: h.type || types[i] || '開場', line: h.line || h.text || '', visual: h.visual || '' });
+      const types = ['血淚控訴型', '反常識打臉型', '閨蜜真心話型'];
+      const hooks = (d.hooks || []).map((h, i) => {
+        if (typeof h === 'string') {
+          // 也接受「【類型】台詞」這種寫法
+          const m = h.match(/^【(.+?)】\s*(.*)$/);
+          return { type: m ? m[1] : (types[i] || '開場'), line: m ? m[2] : h, visual: '' };
+        }
+        return { type: h.type || types[i] || '開場', line: h.line || h.text || '', visual: h.visual || '' };
+      });
       let tags = Array.isArray(d.hashtags) ? d.hashtags.join(' ') : (d.hashtags || '');
       const covers = Array.isArray(d.coverTitles) ? d.coverTitles : (d.coverTitle ? [d.coverTitle] : []);
       return {
+        angle: d.angle || '',
         title: d.title || '', estimatedTime: d.estimatedTime || '', paceHint: d.paceHint || '',
         hooks, storyboard: Array.isArray(d.storyboard) ? d.storyboard : [],
         cta: d.cta || '', coverTitles: covers, hashtags: tags.trim()
@@ -284,6 +299,11 @@
         <header class="fade-in">
           <p class="font-display italic text-editorial-accent text-xs">The Script</p>
           <h3 class="font-serif font-bold text-2xl md:text-3xl leading-snug mt-1">${esc(d.title)}</h3>
+          ${d.angle ? `
+          <div class="mt-4 rounded-2xl bg-editorial-card border border-editorial-border px-4 py-3">
+            <p class="text-[11px] font-semibold tracking-widest text-editorial-accentHover">拍攝角度</p>
+            <p class="text-sm leading-relaxed mt-1">${esc(d.angle)}</p>
+          </div>` : ''}
           <div class="flex flex-wrap gap-2 mt-3 text-[11px] text-editorial-muted">
             <span class="px-2.5 py-1 rounded-full bg-editorial-bg border border-editorial-border">⏱ ${esc(d.estimatedTime)}</span>
             <span class="px-2.5 py-1 rounded-full bg-editorial-bg border border-editorial-border">🗣 ${esc(d.paceHint)}</span>
@@ -391,6 +411,7 @@
       return [
         `【短影音企劃書】${d.title}`,
         `時長：${d.estimatedTime}｜節奏：${d.paceHint}`,
+        ...(d.angle ? ['', '【拍攝角度】', d.angle] : []),
         '',
         '【正式開場】',
         h ? `${h.type}：${h.line}${h.visual ? `\n畫面：${h.visual}` : ''}` : '',
@@ -431,8 +452,24 @@
       formNote.classList.add('hidden');
     });
 
+    // 點範例抱怨，自動填入
+    $('ideaChips').addEventListener('click', e => {
+      const chip = e.target.closest('[data-idea]');
+      if (!chip) return;
+      const [topic, complaint] = chip.dataset.idea.split('|');
+      $('topic').value = topic;
+      $('coreContent').value = complaint;
+      formNote.classList.add('hidden');
+    });
+
     planForm.addEventListener('submit', async e => {
       e.preventDefault();
+      if (!$('topic').value.trim() && !$('coreContent').value.trim()) {
+        formNote.textContent = '至少寫一句你想拍的東西，或你最常聽到的抱怨';
+        formNote.classList.remove('hidden');
+        $('coreContent').focus();
+        return;
+      }
       const payload = {
         code: accessCode,
         topic: $('topic').value.trim(),
