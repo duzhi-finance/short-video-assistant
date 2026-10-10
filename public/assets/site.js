@@ -8,8 +8,71 @@ const SITE = {
   dailyLimit: 20,          // 每組密碼每天可生成次數（後端 DAILY_LIMIT 也要設一樣）
   paymentReady: false,     // 綠界金流串好之後改成 true
   checkoutUrl: '',         // 之後放付款網址或 API 路徑
-  contactEmail: ''         // 客服信箱，請填寫
+  contactEmail: '',        // 客服信箱，請填寫
+  themePicker: true        // 右下角「風格」切換按鈕；選定風格後可改成 false 關掉
 };
+
+/* ---------- 風格切換 ---------- */
+function setTheme(id) {
+  document.documentElement.dataset.theme = id;
+  try { localStorage.setItem('sv_theme', id); } catch {}
+}
+
+function renderThemePicker() {
+  if (!SITE.themePicker || typeof SITE_THEMES === 'undefined') return;
+  const wrap = document.createElement('div');
+  wrap.className = 'fixed z-40 right-4 flex flex-col items-end gap-2';
+  wrap.style.bottom = 'calc(1rem + env(safe-area-inset-bottom, 0px))';
+  wrap.innerHTML = `
+    <div id="themePanel" class="hidden w-72 max-w-[calc(100vw-2rem)] bg-editorial-surface border border-editorial-border rounded-3xl shadow-xl p-4 fade-in">
+      <div class="flex items-baseline justify-between mb-3 px-1">
+        <p class="font-serif font-bold">選一個風格</p>
+        <p class="font-display italic text-xs text-editorial-accent">Style</p>
+      </div>
+      <div id="themeList" class="grid gap-2"></div>
+      <p class="text-[11px] text-editorial-muted mt-3 px-1 leading-relaxed">點一下立刻換，會記在這台裝置上。</p>
+    </div>
+    <button id="themeBtn" type="button" aria-label="切換風格" class="flex items-center gap-2 bg-editorial-surface border border-editorial-border hover:border-editorial-accent shadow-lg rounded-full pl-2 pr-4 py-2 text-xs font-medium transition">
+      <span id="themeDot" class="w-6 h-6 rounded-full border border-editorial-border"></span>風格
+    </button>`;
+  document.body.appendChild(wrap);
+
+  const panel = wrap.querySelector('#themePanel');
+  const list = wrap.querySelector('#themeList');
+  const dot = wrap.querySelector('#themeDot');
+
+  const draw = () => {
+    const current = document.documentElement.dataset.theme;
+    const t = SITE_THEMES.find(x => x.id === current) || SITE_THEMES[0];
+    dot.style.background = `conic-gradient(${t.swatch[2]} 0 25%, ${t.swatch[1]} 0 50%, ${t.swatch[0]} 0 75%, ${t.swatch[3]} 0)`;
+    list.innerHTML = SITE_THEMES.map(x => `
+      <button type="button" data-theme-id="${x.id}" class="text-left rounded-2xl border p-2.5 transition ${x.id === current
+        ? 'border-editorial-accent bg-editorial-card'
+        : 'border-editorial-border hover:border-editorial-accent'}">
+        <div class="theme-swatch">${x.swatch.map(c => `<span style="background:${c}"></span>`).join('')}</div>
+        <div class="flex items-center justify-between mt-2 px-0.5">
+          <span class="text-sm font-semibold">${x.name}</span>
+          ${x.id === current ? '<span class="text-[11px] text-editorial-accentHover">使用中</span>' : ''}
+        </div>
+        <p class="text-[11px] text-editorial-muted px-0.5">${x.note}</p>
+      </button>`).join('');
+  };
+
+  wrap.querySelector('#themeBtn').addEventListener('click', () => {
+    panel.classList.toggle('hidden');
+    if (!panel.classList.contains('hidden')) draw();
+  });
+  list.addEventListener('click', e => {
+    const b = e.target.closest('[data-theme-id]');
+    if (!b) return;
+    setTheme(b.dataset.themeId);
+    draw();
+  });
+  document.addEventListener('click', e => {
+    if (!wrap.contains(e.target)) panel.classList.add('hidden');
+  });
+  draw();
+}
 
 /* ---------- 共用頁首 ---------- */
 function renderHeader(page) {
@@ -42,7 +105,7 @@ function renderHeader(page) {
         ${brand}
         <nav class="hidden md:flex items-center gap-1">${links}</nav>
         <div class="flex items-center gap-2">
-          <a href="/app" class="hidden sm:inline-flex text-xs border border-editorial-border hover:border-editorial-accent bg-white px-4 py-2 rounded-full transition">已購買？進入工具</a>
+          <a href="/app" class="hidden sm:inline-flex text-xs border border-editorial-border hover:border-editorial-accent bg-editorial-surface px-4 py-2 rounded-full transition">已購買？進入工具</a>
           <a href="#pricing" class="inline-flex text-xs bg-editorial-dark hover:bg-editorial-accent text-white px-4 py-2 rounded-full transition">立即購買</a>
           <button id="menuBtn" class="md:hidden w-10 h-10 rounded-full border border-editorial-border flex items-center justify-center" aria-label="開啟選單">☰</button>
         </div>
@@ -136,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFooter();
   fillPrices();
   bindBuyButtons();
+  renderThemePicker();
   openPolicyFromHash();
   window.addEventListener('hashchange', openPolicyFromHash);
 });

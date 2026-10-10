@@ -11,8 +11,8 @@
   <script src="/assets/tailwind-config.js"></script>
   <link rel="stylesheet" href="/assets/site.css">
   <style>
-    .hook-card.is-active { border-color: #B88E52; background: #fff; box-shadow: 0 6px 20px -10px rgba(184,142,82,.55); }
-    .hook-card.is-active .hook-pick { background: #B88E52; color: #fff; border-color: #B88E52; }
+    .hook-card.is-active { border-color: rgb(var(--c-accent)); background: rgb(var(--c-surface)); box-shadow: 0 6px 20px -10px rgb(var(--c-accent) / .55); }
+    .hook-card.is-active .hook-pick { background: rgb(var(--c-accent)); color: #fff; border-color: rgb(var(--c-accent)); }
     .cover-mock { aspect-ratio: 9 / 14; max-width: 100%; }
   </style>
 </head>
@@ -25,7 +25,7 @@
       <div class="w-7 h-7 mx-auto border-2 border-editorial-accent border-t-transparent rounded-full animate-spin mb-3"></div>
       確認中…
     </div>
-    <form id="gateForm" class="hidden bg-white rounded-3xl border border-editorial-border shadow-sm p-7 md:p-8">
+    <form id="gateForm" class="hidden bg-editorial-surface rounded-3xl border border-editorial-border shadow-sm p-7 md:p-8">
       <p class="font-display italic text-editorial-accent text-sm">Members only</p>
       <h1 class="font-serif font-bold text-2xl md:text-3xl mt-1">輸入你的使用密碼</h1>
       <p class="text-sm text-editorial-muted mt-3 leading-relaxed">密碼在付款完成的通知裡。輸入一次之後，這台裝置會自動記住。</p>
@@ -51,7 +51,7 @@
         <h1 class="font-serif font-bold text-3xl md:text-4xl mt-1">開始企劃</h1>
         <p class="text-editorial-muted text-sm mt-2">右邊先放了一份範例，填好左邊再按生成，就會換成你的企劃。</p>
       </div>
-      <aside class="bg-white rounded-2xl border border-editorial-border px-5 py-4 flex items-center gap-5 self-start md:self-auto">
+      <aside class="bg-editorial-surface rounded-2xl border border-editorial-border px-5 py-4 flex items-center gap-5 self-start md:self-auto">
         <div>
           <p class="text-[11px] tracking-widest text-editorial-muted">方案</p>
           <p class="font-serif font-bold">完整版</p>
@@ -72,7 +72,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
 
       <!-- Left: Form -->
-      <section class="lg:col-span-5 lg:sticky lg:top-6 bg-white p-6 md:p-7 rounded-3xl border border-editorial-border shadow-sm">
+      <section class="lg:col-span-5 lg:sticky lg:top-6 bg-editorial-surface p-6 md:p-7 rounded-3xl border border-editorial-border shadow-sm">
         <div class="flex justify-between items-baseline mb-5 pb-3 border-b border-editorial-border/70">
           <div>
             <p class="font-display italic text-editorial-accent text-xs">Brief</p>
@@ -104,7 +104,9 @@
               <label class="block text-[11px] font-semibold text-editorial-muted mb-1.5 tracking-widest">人設與風格</label>
               <select id="style" class="w-full text-sm p-3.5 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none">
                 <option value="質感美學/輕溫柔分享">質感美學 / 溫柔分享</option>
-                <option value="專業幹練/乾貨滿滿">專業幹練 / 乾貨滿滿</option>
+                <option value="閨蜜掏心真心話/犀利共鳴">閨蜜吐槽 / 犀利共鳴</option>
+                <option value="高冷專家/乾貨滿滿">高冷專家 / 乾貨滿滿</option>
+                <option value="反差打臉/打破迷思直白風">反差打臉 / 直白風</option>
                 <option value="幽默風趣/接地氣共鳴">幽默風趣 / 接地氣</option>
                 <option value="高級冷感/沉浸式隨手記">高級冷感 / 沉浸式</option>
               </select>
@@ -142,7 +144,7 @@
       <!-- Right: Result -->
       <section class="lg:col-span-7">
 
-        <div id="loadingState" class="hidden bg-white p-12 rounded-3xl border border-editorial-border text-center min-h-[420px] flex flex-col items-center justify-center">
+        <div id="loadingState" class="hidden bg-editorial-surface p-12 rounded-3xl border border-editorial-border text-center min-h-[420px] flex flex-col items-center justify-center">
           <div class="w-8 h-8 border-2 border-editorial-accent border-t-transparent rounded-full animate-spin mb-4"></div>
           <p class="font-serif text-lg font-semibold">正在撰寫你的爆款企劃…</p>
           <p class="text-editorial-muted text-xs mt-1">安排開場、分鏡與結尾節奏中，大約需要 10 到 30 秒</p>
@@ -150,7 +152,7 @@
 
         <div id="resultState" class="space-y-5">
           <!-- Action bar -->
-          <div class="flex flex-wrap gap-2 justify-between items-center bg-white px-4 py-3 rounded-2xl border border-editorial-border shadow-sm">
+          <div class="flex flex-wrap gap-2 justify-between items-center bg-editorial-surface px-4 py-3 rounded-2xl border border-editorial-border shadow-sm">
             <span id="scriptBadge" class="text-[11px] font-semibold px-3 py-1 bg-editorial-card text-editorial-accentHover rounded-full border border-editorial-border">範例預覽</span>
             <div class="flex items-center gap-2">
               <button id="btnTeleprompter" class="text-xs bg-editorial-bg border border-editorial-border px-3 py-2 rounded-xl hover:border-editorial-accent transition font-medium">🎙️ 提詞器</button>
@@ -159,7 +161,7 @@
             </div>
           </div>
 
-          <article id="scriptContent" class="bg-white p-6 md:p-8 rounded-3xl border border-editorial-border shadow-sm space-y-9"></article>
+          <article id="scriptContent" class="bg-editorial-surface p-6 md:p-8 rounded-3xl border border-editorial-border shadow-sm space-y-9"></article>
         </div>
       </section>
     </div>
@@ -187,7 +189,7 @@
         <button id="tpRestart" class="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20">↺ 從頭</button>
         <label class="flex items-center gap-2">速度 <input id="tpSpeed" type="range" min="10" max="140" value="45" class="w-24"></label>
         <label class="flex items-center gap-2">字級 <input id="tpSize" type="range" min="22" max="64" value="34" class="w-24"></label>
-        <label class="flex items-center gap-2 cursor-pointer"><input id="tpMirror" type="checkbox" class="accent-[#B88E52]"> 鏡像</label>
+        <label class="flex items-center gap-2 cursor-pointer"><input id="tpMirror" type="checkbox" class="accent-editorial-accent"> 鏡像</label>
       </div>
     </div>
   </div>
@@ -336,7 +338,7 @@
               <div class="col-span-6 px-3 py-2.5 border-l border-editorial-border">口白台詞</div>
             </div>
             ${d.storyboard.map((s, i) => `
-              <div class="grid grid-cols-1 md:grid-cols-12 border-t border-editorial-border first:border-t-0 md:first:border-t ${i % 2 ? 'bg-editorial-bg/50' : 'bg-white'}">
+              <div class="grid grid-cols-1 md:grid-cols-12 border-t border-editorial-border first:border-t-0 md:first:border-t ${i % 2 ? 'bg-editorial-bg/50' : 'bg-editorial-surface'}">
                 <div class="md:col-span-1 px-3 pt-3 md:py-3.5 flex md:justify-center">
                   <span class="font-display text-lg text-editorial-accent">${String(i + 1).padStart(2, '0')}</span>
                 </div>
@@ -601,7 +603,7 @@
       if (!slot) return;
       slot.innerHTML = `
         <span class="hidden sm:inline text-xs px-3 py-1.5 rounded-full bg-editorial-card border border-editorial-border text-editorial-accentHover">完整版會員</span>
-        <button id="btnLogout" class="text-xs border border-editorial-border hover:border-editorial-accent bg-white px-3 py-1.5 rounded-full transition">登出</button>`;
+        <button id="btnLogout" class="text-xs border border-editorial-border hover:border-editorial-accent bg-editorial-surface px-3 py-1.5 rounded-full transition">登出</button>`;
       $('btnLogout').addEventListener('click', () => logout('已登出這台裝置'));
     }
 

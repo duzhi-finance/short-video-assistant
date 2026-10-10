@@ -20,7 +20,7 @@
 
   <!-- 登入 -->
   <section id="loginView" class="max-w-md mx-auto px-4 py-16 md:py-24">
-    <form id="loginForm" class="bg-white rounded-3xl border border-editorial-border shadow-sm p-7 md:p-8">
+    <form id="loginForm" class="bg-editorial-surface rounded-3xl border border-editorial-border shadow-sm p-7 md:p-8">
       <p class="font-display italic text-editorial-accent text-sm">Admin</p>
       <h1 class="font-serif font-bold text-2xl md:text-3xl mt-1">密碼管理後台</h1>
       <p class="text-sm text-editorial-muted mt-3 leading-relaxed">輸入你在 Vercel 設定的管理密碼（ADMIN_PASSWORD）。</p>
@@ -28,7 +28,7 @@
       <input id="adminPw" type="password" autocomplete="current-password" placeholder="管理密碼"
         class="w-full mt-6 text-base p-4 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none">
       <label class="flex items-center gap-2 mt-3 text-xs text-editorial-muted cursor-pointer">
-        <input id="rememberMe" type="checkbox" checked class="accent-[#B88E52]"> 在這台裝置記住我
+        <input id="rememberMe" type="checkbox" checked class="accent-editorial-accent"> 在這台裝置記住我
       </label>
       <p id="loginError" class="hidden text-xs text-[#A4482F] mt-3"></p>
       <button id="loginBtn" type="submit" class="w-full mt-4 bg-editorial-dark hover:bg-editorial-accent text-white py-4 rounded-2xl transition font-medium disabled:opacity-60">登入</button>
@@ -51,7 +51,7 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8 items-start">
       <!-- 產生密碼 -->
-      <section class="lg:col-span-5 bg-white rounded-3xl border border-editorial-border p-6 md:p-7 lg:sticky lg:top-24">
+      <section class="lg:col-span-5 bg-editorial-surface rounded-3xl border border-editorial-border p-6 md:p-7 lg:sticky lg:top-24">
         <h2 class="font-serif font-bold text-xl">新增一組密碼</h2>
         <p class="text-sm text-editorial-muted mt-1">有人付款後，在這裡產生密碼給他。</p>
         <form id="createForm" class="mt-5 grid gap-3">
@@ -67,12 +67,12 @@
           <p id="createdCode" class="code-font font-display font-semibold text-2xl md:text-3xl mt-2 select-all break-all"></p>
           <p id="createdNote" class="text-xs text-editorial-muted mt-1"></p>
           <div class="grid grid-cols-2 gap-2 mt-4">
-            <button id="copyCode" class="text-xs bg-white border border-editorial-border hover:border-editorial-accent py-2.5 rounded-xl transition">複製密碼</button>
+            <button id="copyCode" class="text-xs bg-editorial-surface border border-editorial-border hover:border-editorial-accent py-2.5 rounded-xl transition">複製密碼</button>
             <button id="copyMessage" class="text-xs bg-editorial-dark hover:bg-editorial-accent text-white py-2.5 rounded-xl transition">複製給買家的訊息</button>
           </div>
           <details class="mt-3 group">
             <summary class="text-xs text-editorial-muted cursor-pointer list-none">預覽訊息內容 <span class="group-open:hidden">▾</span><span class="hidden group-open:inline">▴</span></summary>
-            <pre id="messagePreview" class="mt-2 whitespace-pre-wrap text-xs leading-relaxed bg-white rounded-xl border border-editorial-border p-3 font-sans"></pre>
+            <pre id="messagePreview" class="mt-2 whitespace-pre-wrap text-xs leading-relaxed bg-editorial-surface rounded-xl border border-editorial-border p-3 font-sans"></pre>
           </details>
         </div>
       </section>
@@ -82,10 +82,10 @@
         <div class="flex items-center gap-3">
           <label for="search" class="sr-only">搜尋</label>
           <input id="search" type="search" placeholder="搜尋密碼或備註"
-            class="flex-1 min-w-0 text-sm p-3 rounded-2xl border border-editorial-border bg-white focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none">
-          <button id="refreshBtn" class="shrink-0 text-xs border border-editorial-border hover:border-editorial-accent bg-white px-4 py-3 rounded-2xl transition">重新整理</button>
+            class="flex-1 min-w-0 text-sm p-3 rounded-2xl border border-editorial-border bg-editorial-surface focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none">
+          <button id="refreshBtn" class="shrink-0 text-xs border border-editorial-border hover:border-editorial-accent bg-editorial-surface px-4 py-3 rounded-2xl transition">重新整理</button>
         </div>
-        <p id="listError" class="hidden text-sm text-[#A4482F] bg-white border border-editorial-border rounded-2xl p-4 mt-4"></p>
+        <p id="listError" class="hidden text-sm text-[#A4482F] bg-editorial-surface border border-editorial-border rounded-2xl p-4 mt-4"></p>
         <div id="codeList" class="grid gap-3 mt-4"></div>
       </section>
     </div>
@@ -155,7 +155,7 @@
       const slot = $('memberSlot');
       if (slot) {
         slot.innerHTML = `<span class="hidden sm:inline text-xs px-3 py-1.5 rounded-full bg-editorial-card border border-editorial-border text-editorial-accentHover">管理者</span>
-          <button id="btnLogout" class="text-xs border border-editorial-border hover:border-editorial-accent bg-white px-3 py-1.5 rounded-full transition">登出</button>`;
+          <button id="btnLogout" class="text-xs border border-editorial-border hover:border-editorial-accent bg-editorial-surface px-3 py-1.5 rounded-full transition">登出</button>`;
         $('btnLogout').addEventListener('click', () => { adminPw = ''; saved.clear(); showLogin('已登出'); });
       }
     }
@@ -204,7 +204,7 @@
 
       if (!codes.length) {
         $('codeList').innerHTML = `
-          <div class="bg-white rounded-2xl border border-dashed border-editorial-border p-8 text-center">
+          <div class="bg-editorial-surface rounded-2xl border border-dashed border-editorial-border p-8 text-center">
             <p class="font-serif font-semibold">還沒有發出任何密碼</p>
             <p class="text-sm text-editorial-muted mt-1">有人付款後，在左邊填上備註、按「產生新密碼」。</p>
           </div>`;
@@ -216,7 +216,7 @@
       }
 
       $('codeList').innerHTML = rows.map(c => `
-        <article class="bg-white rounded-2xl border border-editorial-border p-4 md:p-5 flex flex-col sm:flex-row sm:items-center gap-3 ${c.active ? '' : 'opacity-60'}">
+        <article class="bg-editorial-surface rounded-2xl border border-editorial-border p-4 md:p-5 flex flex-col sm:flex-row sm:items-center gap-3 ${c.active ? '' : 'opacity-60'}">
           <div class="min-w-0 flex-1">
             <div class="flex flex-wrap items-center gap-2">
               <span class="code-font font-semibold text-base">${esc(c.code)}</span>

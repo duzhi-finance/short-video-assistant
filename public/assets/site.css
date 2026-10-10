@@ -1,17 +1,154 @@
-body { font-family: 'Noto Sans TC', sans-serif; background: #FBF9F5; color: #241E19; }
+/* ============================================================
+   風格色票：每個值是 R G B（給 Tailwind 透明度用）
+   新增風格：複製一組 [data-theme] 改顏色，再到 tailwind-config.js 的 SITE_THEMES 加一筆
+   ============================================================ */
+:root, [data-theme="editorial"] {
+  --c-bg: 251 249 245;
+  --c-surface: 255 255 255;
+  --c-card: 243 238 231;
+  --c-oat: 234 226 214;
+  --c-border: 226 217 207;
+  --c-accent: 184 142 82;
+  --c-accent-hover: 159 119 65;
+  --c-dark: 36 30 25;
+  --c-muted: 122 111 102;
+  --c-body: 74 64 57;
+  --page-glow: none;
+}
+[data-theme="luxe"] {
+  --c-bg: 249 246 240;
+  --c-surface: 255 255 255;
+  --c-card: 242 237 228;
+  --c-oat: 233 225 211;
+  --c-border: 230 223 213;
+  --c-accent: 168 130 74;
+  --c-accent-hover: 142 107 57;
+  --c-dark: 28 24 21;
+  --c-muted: 126 117 107;
+  --c-body: 70 61 54;
+  --page-glow:
+    radial-gradient(900px 520px at 8% -6%, rgb(233 214 182 / .55), transparent 60%),
+    radial-gradient(760px 520px at 100% 12%, rgb(242 226 214 / .65), transparent 62%),
+    radial-gradient(900px 640px at 50% 110%, rgb(226 214 196 / .5), transparent 60%);
+}
+[data-theme="rose"] {
+  --c-bg: 251 246 244;
+  --c-surface: 255 255 255;
+  --c-card: 244 233 230;
+  --c-oat: 235 218 213;
+  --c-border: 232 216 211;
+  --c-accent: 176 122 114;
+  --c-accent-hover: 150 95 88;
+  --c-dark: 42 31 30;
+  --c-muted: 133 113 109;
+  --c-body: 82 63 60;
+  --page-glow: radial-gradient(900px 560px at 90% -10%, rgb(240 214 208 / .5), transparent 60%);
+}
+[data-theme="sage"] {
+  --c-bg: 247 248 244;
+  --c-surface: 255 255 255;
+  --c-card: 236 239 230;
+  --c-oat: 223 228 214;
+  --c-border: 220 226 212;
+  --c-accent: 124 139 106;
+  --c-accent-hover: 99 113 79;
+  --c-dark: 31 36 32;
+  --c-muted: 110 116 104;
+  --c-body: 63 69 60;
+  --page-glow: none;
+}
+[data-theme="ink"] {
+  --c-bg: 246 247 249;
+  --c-surface: 255 255 255;
+  --c-card: 236 238 242;
+  --c-oat: 221 225 232;
+  --c-border: 221 225 232;
+  --c-accent: 62 92 138;
+  --c-accent-hover: 46 72 112;
+  --c-dark: 22 27 36;
+  --c-muted: 107 114 128;
+  --c-body: 55 62 75;
+  --page-glow: none;
+}
+
+/* ---------- 基本 ---------- */
+:root { color-scheme: light; }
+body {
+  font-family: 'Noto Sans TC', sans-serif;
+  background-color: rgb(var(--c-bg));
+  background-image: var(--page-glow);
+  background-attachment: fixed;
+  color: rgb(var(--c-dark));
+  transition: background-color .4s ease, color .4s ease;
+}
 h1, h2, h3 { text-wrap: balance; }
-.rule { height: 1px; background: linear-gradient(90deg, transparent, #B88E52 20%, #B88E52 80%, transparent); opacity: .45; }
+.rule { height: 1px; background: linear-gradient(90deg, transparent, rgb(var(--c-accent)) 20%, rgb(var(--c-accent)) 80%, transparent); opacity: .45; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .no-scrollbar { scrollbar-width: none; }
 .fade-in { animation: fadeIn .45s ease both; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
-@media (prefers-reduced-motion: reduce) { .fade-in { animation: none; } }
-input[type=range] { accent-color: #B88E52; }
-:focus-visible { outline: 2px solid #B88E52; outline-offset: 2px; }
+input[type=range], input[type=checkbox], input[type=radio] { accent-color: rgb(var(--c-accent)); }
+:focus-visible { outline: 2px solid rgb(var(--c-accent)); outline-offset: 2px; }
+
+/* ---------- 條款排版 ---------- */
 .prose-terms h2 { font-family: 'Noto Serif TC', serif; font-weight: 700; font-size: 1.25rem; margin-top: 2.25rem; margin-bottom: .75rem; }
 .prose-terms h3 { font-weight: 600; margin-top: 1.25rem; margin-bottom: .5rem; }
-.prose-terms p, .prose-terms li { line-height: 1.85; font-size: .925rem; color: #4A4039; }
+.prose-terms p, .prose-terms li { line-height: 1.85; font-size: .925rem; color: rgb(var(--c-body)); }
 .prose-terms ol, .prose-terms ul { padding-left: 1.25rem; display: grid; gap: .35rem; }
 .prose-terms ol { list-style: decimal; }
 .prose-terms ul { list-style: disc; }
-.fill-in { background: #F3EEE7; border-bottom: 1px dashed #B88E52; padding: 0 .3em; color: #9F7741; }
+.fill-in { background: rgb(var(--c-card)); border-bottom: 1px dashed rgb(var(--c-accent)); padding: 0 .3em; color: rgb(var(--c-accent-hover)); }
+
+/* ---------- 卡片浮起（所有風格都有輕微效果） ---------- */
+article, .hook-card, .cover-mock, details.policy {
+  transition: transform .35s cubic-bezier(.2,.7,.2,1), box-shadow .35s ease, border-color .25s ease, background-color .4s ease;
+}
+article:hover, .hook-card:hover, .cover-mock:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px -18px rgb(var(--c-dark) / .35);
+}
+
+/* ---------- 霧面香檳：毛玻璃卡片與金屬細邊 ---------- */
+[data-theme="luxe"] .bg-editorial-surface {
+  background-color: rgb(255 255 255 / .62);
+  -webkit-backdrop-filter: blur(16px) saturate(1.25);
+  backdrop-filter: blur(16px) saturate(1.25);
+}
+[data-theme="luxe"] .border-editorial-border {
+  border-color: rgb(var(--c-accent) / .22);
+}
+[data-theme="luxe"] .shadow-sm {
+  box-shadow: 0 1px 0 rgb(255 255 255 / .8) inset, 0 10px 30px -22px rgb(var(--c-dark) / .35);
+}
+[data-theme="luxe"] h1, [data-theme="luxe"] h2 { letter-spacing: -.01em; }
+
+/* ---------- 生成中動畫 ---------- */
+.loading-line {
+  position: relative; height: 1px; width: 12rem; max-width: 70%; margin: 0 auto;
+  background: rgb(var(--c-border)); overflow: hidden;
+}
+.loading-line::after {
+  content: ""; position: absolute; inset: 0; width: 40%;
+  background: linear-gradient(90deg, transparent, rgb(var(--c-accent)), transparent);
+  animation: sweep 1.6s ease-in-out infinite;
+}
+@keyframes sweep { from { transform: translateX(-100%); } to { transform: translateX(250%); } }
+.loading-word { transition: opacity .6s ease, transform .6s ease; }
+.loading-word.is-out { opacity: 0; transform: translateY(6px); }
+.loading-orb {
+  width: 3.25rem; height: 3.25rem; border-radius: 9999px;
+  border: 1px solid rgb(var(--c-accent) / .4);
+  display: flex; align-items: center; justify-content: center;
+  color: rgb(var(--c-accent));
+  animation: breathe 2.4s ease-in-out infinite;
+}
+@keyframes breathe { 0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgb(var(--c-accent) / .25); } 50% { transform: scale(1.06); box-shadow: 0 0 0 12px rgb(var(--c-accent) / 0); } }
+
+/* ---------- 風格切換面板 ---------- */
+.theme-swatch { display: flex; height: 1.75rem; border-radius: .6rem; overflow: hidden; border: 1px solid rgb(0 0 0 / .08); }
+.theme-swatch span { flex: 1; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fade-in, .loading-line::after, .loading-orb { animation: none; }
+  article:hover, .hook-card:hover, .cover-mock:hover { transform: none; }
+}
