@@ -1,9 +1,52 @@
 // 生成企劃。環境變數：GEMINI_API_KEY（必填），密碼與次數設定見 _access.js
-import { isValidCode, getUsage, addUsage, DAILY_LIMIT } from './_access.js';
+import { isValidCode, getUsage, addUsage, DAILY_LIMIT, HOOK_DAILY_LIMIT } from './_access.js';
 
 // 模型名稱。Google 換新模型時，在 Vercel 環境變數設定 GEMINI_MODEL 就能更換，不用改程式
 // 預設用速度快、成本低的 Flash-Lite；想要更強的模型可設 GEMINI_MODEL=gemini-3.8-flash（比較慢）
 const MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
+
+// 呼叫 Gemini，回傳解析好的 JSON；先請模型少想一點，不支援時改用預設設定
+async function askGemini(apiKey, prompt, timeoutMs = 55000) {
+  const call = async lowThinking => {
+    const generationConfig = { responseMimeType: 'application/json' };
+    if (lowThinking) generationConfig.thinkingConfig = { thinkingLevel: 'low' };
+    const r = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig }),
+        signal: AbortSignal.timeout(timeoutMs),
+      }
+    );
+    return { r, data: await r.json() };
+  };
+  let { r, data } = await call(true);
+  if (r.status === 400 && /think/i.test(data.error?.message || '')) ({ r, data } = await call(false));
+  if (!r.ok) {
+    const e = new Error(data.error?.message || 'AI 服務出錯');
+    e.upstream = true;
+    throw e;
+  }
+  // 只取正式回答的部分（略過模型的思考內容），並清掉可能的 ```json 包裝
+  const text = (data.candidates?.[0]?.content?.parts || [])
+    .filter(p => !p.thought && p.text)
+    .map(p => p.text)
+    .join('')
+    .replace(/```json|```/g, '')
+    .trim();
+  return JSON.parse(text);
+}
+
+function sendError(res, err) {
+  if (err.name === 'TimeoutError' || err.name === 'AbortError') {
+    return res.status(504).json({ error: 'AI 回應太久，請再按一次' });
+  }
+  if (err instanceof SyntaxError) {
+    return res.status(500).json({ error: 'AI 回傳格式不完整，請再試一次' });
+  }
+  return res.status(500).json({ error: err.upstream ? err.message : '生成失敗：' + err.message });
+}
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -15,7 +58,7 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: '後端沒有設定 GEMINI_API_KEY' });
   }
 
-  const { code, topic, coreContent, style, duration, platform = '全平台通用' } = req.body || {};
+  const { code, mode, topic, coreContent, style, duration, platform = '全平台通用' } = req.body || {};
 
   let valid;
   try {
@@ -26,6 +69,9 @@ export default async function handler(req, res) {
   if (!valid) {
     return res.status(401).json({ error: '密碼無效，請重新輸入' });
   }
+
+  // 只換一個開場：另外計次，不佔每日生成次數
+  if (mode === 'hook') return regenerateHook(req, res, apiKey);
 
   try {
     const { remaining } = await getUsage(code);
@@ -94,41 +140,8 @@ export default async function handler(req, res) {
 }
 storyboard 請給 ${sceneCount} 段。`;
 
-  // 呼叫 Gemini；lowThinking 會請模型少想一點、回答快一點
-  const callGemini = async lowThinking => {
-    const generationConfig = { responseMimeType: 'application/json' };
-    if (lowThinking) generationConfig.thinkingConfig = { thinkingLevel: 'low' };
-    const r = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
-        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig }),
-        signal: AbortSignal.timeout(55000),
-      }
-    );
-    return { r, data: await r.json() };
-  };
-
   try {
-    let { r: aiRes, data: aiData } = await callGemini(true);
-    // 如果這個模型不支援調整思考程度，改用預設設定再試一次
-    if (aiRes.status === 400 && /think/i.test(aiData.error?.message || '')) {
-      ({ r: aiRes, data: aiData } = await callGemini(false));
-    }
-    if (!aiRes.ok) {
-      return res.status(500).json({ error: aiData.error?.message || 'AI 服務出錯' });
-    }
-
-    // 只取正式回答的部分（略過模型的思考內容）
-    let text = (aiData.candidates?.[0]?.content?.parts || [])
-      .filter(p => !p.thought && p.text)
-      .map(p => p.text)
-      .join('');
-    // 保險：清掉可能出現的 ```json 包裝
-    text = text.replace(/```json|```/g, '').trim();
-
-    const result = JSON.parse(text);
+    const result = await askGemini(apiKey, prompt);
 
     // 檢查前端需要的欄位
     if (!Array.isArray(result.hooks) || !Array.isArray(result.storyboard)) {
@@ -140,12 +153,56 @@ storyboard 請給 ${sceneCount} 段。`;
 
     return res.status(200).json({ result, remaining: usage.remaining, dailyLimit: DAILY_LIMIT });
   } catch (err) {
-    if (err.name === 'TimeoutError' || err.name === 'AbortError') {
-      return res.status(504).json({ error: 'AI 回應太久，請再按一次生成' });
+    return sendError(res, err);
+  }
+}
+
+const HOOK_GUIDE = {
+  '痛點共鳴型': '像私下聊天抱怨，直接說出觀眾正在犯的錯和後果',
+  '反常識打臉型': '犀利打破迷思，推翻大家深信不疑的做法',
+  '掏心掏肺型': '真心勸告的私房話，像好朋友拉著你說'
+};
+
+async function regenerateHook(req, res, apiKey) {
+  const { code, topic, coreContent, style, platform = '全平台通用', hookType, angle, title, avoid } = req.body || {};
+
+  try {
+    const { remaining } = await getUsage(code, 'hook', HOOK_DAILY_LIMIT);
+    if (remaining === 0) {
+      return res.status(429).json({ error: `今天「換一句」的 ${HOOK_DAILY_LIMIT} 次已經用完，可以整份重新生成，或明天再換` });
     }
-    if (err instanceof SyntaxError) {
-      return res.status(500).json({ error: 'AI 回傳格式不完整，請再試一次' });
-    }
-    return res.status(500).json({ error: '生成失敗：' + err.message });
+  } catch {}
+
+  const type = String(hookType || '痛點共鳴型').slice(0, 20);
+  const avoidList = (Array.isArray(avoid) ? avoid : []).slice(0, 6).map(a => `- ${String(a).slice(0, 120)}`).join('\n');
+
+  const prompt = `你是台灣頂尖的短影音編導。請為下面這支影片重新寫「一句」開場 Hook。
+全部使用台灣繁體中文與台灣人日常說話的用語，不要用大陸用語。
+
+影片主題：${topic || '（沒寫）'}
+觀眾的抱怨／常問的問題：${coreContent || '（沒寫）'}
+拍攝角度：${angle || '（沒寫）'}
+影片標題：${title || '（沒寫）'}
+人設與風格：${style || '（沒寫）'}
+平台：${platform}
+
+開場類型：${type}（${HOOK_GUIDE[type] || '狠戳痛點、像跟好朋友講話'}）
+
+要求：
+- 3 秒內講得完，像真人對著鏡頭講話，口語、抓耳，可以用「妳是不是也常常…」「真心勸妳…」「誰還不知道這件事…」這類起手
+- 禁止「各位觀眾」「大家好」「今天我們要來探討」這類官方開場
+- 要跟下面這些已經寫過的開場明顯不同，不要換字重寫：
+${avoidList || '- （無）'}
+
+只回傳合法 JSON：{ "type": "${type}", "line": "開場台詞", "visual": "開場畫面、手部動作與鏡頭位置" }`;
+
+  try {
+    const hook = await askGemini(apiKey, prompt, 40000);
+    if (!hook || !hook.line) return res.status(500).json({ error: 'AI 回傳格式不完整，請再試一次' });
+    let usage = { remaining: null };
+    try { usage = await addUsage(code, 'hook', HOOK_DAILY_LIMIT); } catch {}
+    return res.status(200).json({ hook: { type, line: hook.line, visual: hook.visual || '' }, hookRemaining: usage.remaining });
+  } catch (err) {
+    return sendError(res, err);
   }
 }

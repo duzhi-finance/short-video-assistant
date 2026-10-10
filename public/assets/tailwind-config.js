@@ -3,7 +3,8 @@
    - 每個風格的顏色定義在 site.css 的 [data-theme="..."]
    - 預設風格改 SITE_DEFAULT_THEME；使用者選過的會記在瀏覽器裡
    ============================================================ */
-const SITE_DEFAULT_THEME = 'editorial';
+const SITE_DEFAULT_THEME = 'luxe';
+const SITE_LOCK_THEME = true; // true：全站固定用上面的風格；想開放切換就改成 false，並把 site.js 的 themePicker 改成 true
 
 const SITE_THEMES = [
   { id: 'editorial', name: '燕麥雜誌', note: '奶油米白・香檳金・經典雜誌感', swatch: ['#FBF9F5', '#EAE2D6', '#B88E52', '#241E19'] },
@@ -16,7 +17,7 @@ const SITE_THEMES = [
 // 在頁面畫出來之前就套用風格，避免閃一下
 (function applySavedTheme() {
   let id = SITE_DEFAULT_THEME;
-  try { id = localStorage.getItem('sv_theme') || id; } catch {}
+  if (!SITE_LOCK_THEME) { try { id = localStorage.getItem('sv_theme') || id; } catch {} }
   if (!SITE_THEMES.some(t => t.id === id)) id = SITE_DEFAULT_THEME;
   document.documentElement.dataset.theme = id;
 })();

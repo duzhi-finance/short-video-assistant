@@ -9,7 +9,7 @@ const SITE = {
   paymentReady: false,     // 綠界金流串好之後改成 true
   checkoutUrl: '',         // 之後放付款網址或 API 路徑
   contactEmail: '',        // 客服信箱，請填寫
-  themePicker: true        // 右下角「風格」切換按鈕；選定風格後可改成 false 關掉
+  themePicker: false       // 右下角「風格」切換按鈕；目前固定霧面香檳，所以關掉
 };
 
 /* ---------- 風格切換 ---------- */

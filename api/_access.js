@@ -12,6 +12,8 @@
 import { createHash, randomInt, timingSafeEqual } from 'node:crypto';
 
 export const DAILY_LIMIT = Number(process.env.DAILY_LIMIT) || 20;
+// 「換一句開場」另外計算，不佔每日生成次數
+export const HOOK_DAILY_LIMIT = Number(process.env.HOOK_DAILY_LIMIT) || 40;
 
 const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
@@ -53,24 +55,24 @@ function todayTW() {
   return new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
 }
 
-export function usageKey(code) {
+export function usageKey(code, kind = 'gen') {
   const id = createHash('sha256').update(normalize(code)).digest('hex').slice(0, 16);
-  return `usage:${todayTW()}:${id}`;
+  return kind === 'gen' ? `usage:${todayTW()}:${id}` : `usage-${kind}:${todayTW()}:${id}`;
 }
 
 // 回傳 { used, remaining }；沒有資料庫時 remaining 為 null（不限次數）
-export async function getUsage(code) {
+export async function getUsage(code, kind = 'gen', limit = DAILY_LIMIT) {
   if (!redisReady) return { used: 0, remaining: null };
-  const used = Number(await redis('GET', usageKey(code))) || 0;
-  return { used, remaining: Math.max(0, DAILY_LIMIT - used) };
+  const used = Number(await redis('GET', usageKey(code, kind))) || 0;
+  return { used, remaining: Math.max(0, limit - used) };
 }
 
-export async function addUsage(code) {
+export async function addUsage(code, kind = 'gen', limit = DAILY_LIMIT) {
   if (!redisReady) return { used: 0, remaining: null };
-  const key = usageKey(code);
+  const key = usageKey(code, kind);
   const used = Number(await redis('INCR', key));
   if (used === 1) await redis('EXPIRE', key, 2 * 24 * 3600);
-  return { used, remaining: Math.max(0, DAILY_LIMIT - used) };
+  return { used, remaining: Math.max(0, limit - used) };
 }
 
 /* ---------- 後台管理 ---------- */

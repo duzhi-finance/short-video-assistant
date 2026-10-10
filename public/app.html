@@ -144,10 +144,14 @@
       <!-- Right: Result -->
       <section class="lg:col-span-7">
 
-        <div id="loadingState" class="hidden bg-editorial-surface p-12 rounded-3xl border border-editorial-border text-center min-h-[420px] flex flex-col items-center justify-center">
-          <div class="w-8 h-8 border-2 border-editorial-accent border-t-transparent rounded-full animate-spin mb-4"></div>
-          <p class="font-serif text-lg font-semibold">正在撰寫你的爆款企劃…</p>
-          <p class="text-editorial-muted text-xs mt-1">安排開場、分鏡與結尾節奏中，大約需要 10 到 30 秒</p>
+        <div id="loadingState" class="hidden bg-editorial-surface p-12 rounded-3xl border border-editorial-border shadow-sm text-center min-h-[420px] flex flex-col items-center justify-center gap-5">
+          <div class="loading-orb font-display text-lg">✦</div>
+          <div>
+            <p class="font-display italic text-editorial-accent text-xs tracking-widest">Composing your script</p>
+            <p id="loadingWord" class="loading-word font-serif text-lg font-semibold mt-2">正在拆解你的痛點…</p>
+          </div>
+          <div class="loading-line"></div>
+          <p class="text-editorial-muted text-[11px]">大約需要 10 到 30 秒</p>
         </div>
 
         <div id="resultState" class="space-y-5">
@@ -157,7 +161,33 @@
             <div class="flex items-center gap-2">
               <button id="btnTeleprompter" class="text-xs bg-editorial-bg border border-editorial-border px-3 py-2 rounded-xl hover:border-editorial-accent transition font-medium">🎙️ 提詞器</button>
               <button id="btnDownload" class="text-xs bg-editorial-bg border border-editorial-border px-3 py-2 rounded-xl hover:border-editorial-accent transition font-medium">⤓ 匯出</button>
-              <button id="btnCopy" class="text-xs bg-editorial-dark text-white px-3.5 py-2 rounded-xl hover:bg-editorial-accent transition font-medium">📋 複製腳本</button>
+              <div class="relative">
+                <button id="btnCopy" aria-haspopup="true" aria-expanded="false" class="text-xs bg-editorial-dark text-white px-3.5 py-2 rounded-xl hover:bg-editorial-accent transition font-medium">📋 複製 ▾</button>
+                <div id="copyMenu" class="hidden absolute right-0 top-full mt-2 w-60 bg-editorial-surface border border-editorial-border rounded-2xl shadow-xl p-1.5 z-30">
+                  <button data-copy-format="plain" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-editorial-card transition">
+                    <span class="block text-sm font-medium">完整腳本</span>
+                    <span class="block text-[11px] text-editorial-muted">一般文字，貼到 LINE、備忘錄</span>
+                  </button>
+                  <button data-copy-format="markdown" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-editorial-card transition">
+                    <span class="block text-sm font-medium">Notion／Markdown</span>
+                    <span class="block text-[11px] text-editorial-muted">貼到 Notion 自動變成標題和表格</span>
+                  </button>
+                  <button data-copy-format="subtitle" class="w-full text-left px-3 py-2.5 rounded-xl hover:bg-editorial-card transition">
+                    <span class="block text-sm font-medium">剪映／CapCut 字幕稿</span>
+                    <span class="block text-[11px] text-editorial-muted">只有口白，一句一行，可直接貼到文字軌</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 版本與換語氣 -->
+          <div class="flex flex-wrap gap-3 justify-between items-center">
+            <div class="flex items-center gap-1.5 min-w-0 overflow-x-auto no-scrollbar" id="versionBar"></div>
+            <div class="flex items-center gap-2">
+              <label for="toneSwitch" class="sr-only">換一種語氣</label>
+              <select id="toneSwitch" class="text-xs p-2 rounded-xl border border-editorial-border bg-editorial-surface focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none"></select>
+              <button id="btnRewrite" class="text-xs border border-editorial-accent text-editorial-accentHover hover:bg-editorial-accent hover:text-white px-3 py-2 rounded-xl transition font-medium whitespace-nowrap disabled:opacity-60">換這個語氣重寫</button>
             </div>
           </div>
 
@@ -183,13 +213,29 @@
       </div>
     </div>
 
-    <div class="px-4 py-4 border-t border-white/10 bg-[#1C1816]">
-      <div class="max-w-3xl mx-auto flex flex-wrap items-center gap-x-6 gap-y-3 justify-center text-xs">
-        <button id="tpPlay" class="px-6 py-2.5 rounded-full bg-editorial-accent hover:bg-editorial-accentHover text-white font-medium text-sm">▶ 開始</button>
-        <button id="tpRestart" class="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20">↺ 從頭</button>
-        <label class="flex items-center gap-2">速度 <input id="tpSpeed" type="range" min="10" max="140" value="45" class="w-24"></label>
-        <label class="flex items-center gap-2">字級 <input id="tpSize" type="range" min="22" max="64" value="34" class="w-24"></label>
-        <label class="flex items-center gap-2 cursor-pointer"><input id="tpMirror" type="checkbox" class="accent-editorial-accent"> 鏡像</label>
+    <div class="px-4 py-4 border-t border-white/10 bg-[#1C1816]" style="padding-bottom: calc(1rem + env(safe-area-inset-bottom, 0px))">
+      <div class="max-w-3xl mx-auto grid gap-3">
+        <!-- 字數與秒數預算 -->
+        <div class="text-[11px] text-white/70">
+          <div class="flex flex-wrap items-baseline justify-between gap-2">
+            <span>全文 <b id="tpChars" class="text-white tabular-nums">0</b> 字 · 念完約 <b id="tpRead" class="text-white tabular-nums">0</b> 秒 · 目標 <b id="tpTarget" class="text-white tabular-nums">30</b> 秒</span>
+            <span id="tpClock" class="font-display text-base text-white tabular-nums">00:00 / 00:30</span>
+          </div>
+          <div class="h-1 rounded-full bg-white/10 mt-2 overflow-hidden"><div id="tpBar" class="h-full rounded-full transition-all" style="width:0%"></div></div>
+          <p id="tpBudgetNote" class="mt-1.5"></p>
+        </div>
+        <div class="flex flex-wrap items-center gap-x-5 gap-y-3 justify-center text-xs">
+          <button id="tpPlay" class="px-6 py-2.5 rounded-full bg-editorial-accent hover:bg-editorial-accentHover text-white font-medium text-sm">▶ 開始</button>
+          <button id="tpRestart" class="px-4 py-2.5 rounded-full bg-white/10 hover:bg-white/20">↺ 從頭</button>
+          <div class="flex rounded-full overflow-hidden border border-white/15" role="group" aria-label="捲動速度">
+            <button data-tp-preset="slow" class="px-3 py-2 bg-white/10 hover:bg-white/20 transition">慢速</button>
+            <button data-tp-preset="normal" class="px-3 py-2 bg-white/10 hover:bg-white/20 transition">正常</button>
+            <button data-tp-preset="fast" class="px-3 py-2 bg-white/10 hover:bg-white/20 transition">快節奏</button>
+          </div>
+          <label class="flex items-center gap-2">微調 <input id="tpSpeed" type="range" min="5" max="400" value="45" class="w-20"></label>
+          <label class="flex items-center gap-2">字級 <input id="tpSize" type="range" min="22" max="64" value="34" class="w-20"></label>
+          <label class="flex items-center gap-2 cursor-pointer"><input id="tpMirror" type="checkbox"> 鏡像</label>
+        </div>
       </div>
     </div>
   </div>
@@ -315,17 +361,18 @@
 
         <section class="fade-in">
           ${sectionHead('01', 'Golden 3 Seconds · A/B Test', '黃金 3 秒 Hook 開場')}
-          <p class="text-xs text-editorial-muted -mt-2 mb-3">點選一個作為正式開場，提詞器與複製腳本會跟著使用。</p>
+          <p class="text-xs text-editorial-muted -mt-2 mb-3">點選一個作為正式開場，提詞器與複製腳本會跟著使用。不喜歡哪句，按「換一句」只換那句，不扣每日次數。</p>
           <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             ${d.hooks.map((h, i) => `
-              <button type="button" data-hook="${i}" class="hook-card ${i === selectedHook ? 'is-active' : ''} text-left p-4 rounded-2xl bg-editorial-bg border border-editorial-border hover:border-editorial-accent transition flex flex-col gap-2">
-                <div class="flex items-center justify-between">
+              <div role="button" tabindex="0" data-hook="${i}" aria-pressed="${i === selectedHook}" class="hook-card ${i === selectedHook ? 'is-active' : ''} cursor-pointer text-left p-4 rounded-2xl bg-editorial-bg border border-editorial-border hover:border-editorial-accent flex flex-col gap-2">
+                <div class="flex items-center justify-between gap-2">
                   <span class="text-[10px] font-semibold tracking-widest text-editorial-accentHover">${String.fromCharCode(65 + i)} · ${esc(h.type)}</span>
-                  <span class="hook-pick text-[10px] px-2 py-0.5 rounded-full border border-editorial-border text-editorial-muted">${i === selectedHook ? '使用中' : '選用'}</span>
+                  <span class="hook-pick text-[10px] px-2 py-0.5 rounded-full border border-editorial-border text-editorial-muted shrink-0">${i === selectedHook ? '使用中' : '選用'}</span>
                 </div>
                 <p class="font-serif text-[15px] font-semibold leading-relaxed">「${esc(h.line)}」</p>
                 ${h.visual ? `<p class="text-[11px] text-editorial-muted leading-relaxed">🎥 ${esc(h.visual)}</p>` : ''}
-              </button>`).join('')}
+                <button type="button" data-regen="${i}" class="self-start mt-auto text-[11px] text-editorial-accentHover hover:text-editorial-dark underline-offset-4 hover:underline disabled:opacity-60 disabled:no-underline">↻ 換一句</button>
+              </div>`).join('')}
           </div>
         </section>
 
@@ -382,31 +429,82 @@
       scriptContent.innerHTML = html;
     }
 
-    function showResult(raw, isDemo) {
-      currentData = normalize(raw);
-      selectedHook = 0;
+    /* ---------- 版本 ---------- */
+    // 每次生成都存成一個版本，換了不喜歡可以點回前一版
+    const versions = [];
+    let activeVersion = -1;
+
+    function styleLabel(value) {
+      const opt = [...$('style').options].find(o => o.value === value);
+      return opt ? opt.textContent.split('/')[0].trim() : '';
+    }
+
+    function addVersion(raw, { isDemo = false, style = '', input = null } = {}) {
+      versions.push({ data: normalize(raw), selectedHook: 0, isDemo, style, input });
+      if (versions.length > 12) versions.shift();
+      activateVersion(versions.length - 1);
+    }
+
+    function activateVersion(i) {
+      activeVersion = i;
+      const v = versions[i];
+      currentData = v.data;
+      selectedHook = v.selectedHook;
       render(currentData);
-      scriptBadge.textContent = isDemo ? '範例預覽' : '✦ 企劃完成';
+      scriptBadge.textContent = v.isDemo ? '範例預覽' : '✦ 企劃完成';
+      renderVersionBar();
       loadingState.classList.add('hidden');
       resultState.classList.remove('hidden');
     }
 
-    /* ---------- 互動 ---------- */
-    scriptContent.addEventListener('click', e => {
-      const hookBtn = e.target.closest('[data-hook]');
-      if (hookBtn) {
-        selectedHook = Number(hookBtn.dataset.hook);
-        render(currentData);
+    function renderVersionBar() {
+      const real = versions.map((v, i) => ({ v, i })).filter(x => !x.v.isDemo);
+      const bar = $('versionBar');
+      if (!real.length) {
+        bar.innerHTML = '<span class="text-[11px] text-editorial-muted">生成後，每個版本都會留在這裡</span>';
         return;
       }
+      bar.innerHTML = '<span class="text-[11px] text-editorial-muted shrink-0">版本</span>' + real.map(({ v, i }, n) => `
+        <button type="button" data-version="${i}" title="${esc(v.style ? styleLabel(v.style) : '')}"
+          class="shrink-0 text-xs px-3 py-1.5 rounded-full border transition ${i === activeVersion
+            ? 'bg-editorial-dark text-white border-editorial-dark'
+            : 'bg-editorial-surface border-editorial-border hover:border-editorial-accent'}">${n + 1}${v.style ? `<span class="opacity-70"> · ${esc(styleLabel(v.style))}</span>` : ''}</button>`).join('');
+    }
+
+    $('versionBar').addEventListener('click', e => {
+      const b = e.target.closest('[data-version]');
+      if (b) activateVersion(Number(b.dataset.version));
+    });
+
+    // 選開場時記在目前版本
+    function pickHook(i) {
+      selectedHook = i;
+      if (versions[activeVersion]) versions[activeVersion].selectedHook = i;
+      render(currentData);
+    }
+
+    /* ---------- 互動 ---------- */
+    scriptContent.addEventListener('click', e => {
+      const regen = e.target.closest('[data-regen]');
+      if (regen) { e.stopPropagation(); regenerateHook(Number(regen.dataset.regen), regen); return; }
+      const hookCard = e.target.closest('[data-hook]');
+      if (hookCard) { pickHook(Number(hookCard.dataset.hook)); return; }
       const copyBtn = e.target.closest('[data-copy]');
       if (copyBtn) copyText(copyBtn.dataset.copy, '已複製');
+    });
+    scriptContent.addEventListener('keydown', e => {
+      const hookCard = e.target.closest('[data-hook]');
+      if (hookCard && (e.key === 'Enter' || e.key === ' ') && e.target === hookCard) {
+        e.preventDefault();
+        pickHook(Number(hookCard.dataset.hook));
+      }
     });
 
     function copyText(text, msg) {
       navigator.clipboard.writeText(text).then(() => toast(msg)).catch(() => toast('複製失敗，請手動選取'));
     }
 
+    /* ---------- 三種複製格式 ---------- */
     function buildScriptText() {
       const d = currentData;
       const h = d.hooks[selectedHook];
@@ -435,14 +533,82 @@
       ].join('\n');
     }
 
-    $('btnCopy').addEventListener('click', () => currentData && copyText(buildScriptText(), '完整腳本已複製'));
+    function buildMarkdown() {
+      const d = currentData;
+      const h = d.hooks[selectedHook];
+      const cell = s => String(s || '').replace(/\|/g, '｜').replace(/\n/g, ' ');
+      return [
+        `# ${d.title}`,
+        '',
+        `> **時長**：${d.estimatedTime}　**節奏**：${d.paceHint}`,
+        ...(d.angle ? ['', `**拍攝角度**：${d.angle}`] : []),
+        '',
+        '## 開場',
+        ...(h ? [`**正式開場（${h.type}）**：「${h.line}」`, ...(h.visual ? [`- 畫面：${h.visual}`] : [])] : []),
+        '',
+        '**備選開場**',
+        ...d.hooks.filter((_, i) => i !== selectedHook).map(x => `- ${x.type}：「${x.line}」`),
+        '',
+        '## 分鏡腳本',
+        '',
+        '| # | 畫面 | 口白 |',
+        '| --- | --- | --- |',
+        ...d.storyboard.map((s, i) => `| ${i + 1} | ${cell(s.visual)} | ${cell(s.audio)} |`),
+        '',
+        '## 結尾 CTA',
+        d.cta,
+        '',
+        '## 封面大字',
+        ...d.coverTitles.map(c => `- ${c}`),
+        '',
+        '## Hashtags',
+        d.hashtags,
+        '',
+        '- [ ] 開場拍完',
+        '- [ ] 分鏡拍完',
+        '- [ ] 剪輯上字幕',
+        '- [ ] 發布'
+      ].join('\n');
+    }
+
+    function buildSubtitles() {
+      const d = currentData;
+      const h = d.hooks[selectedHook];
+      const lines = [h ? h.line : '', ...d.storyboard.map(s => s.audio), d.cta].join('。');
+      // 依句號、問號、驚嘆號、刪節號斷行，一句一行
+      return lines
+        .split(/(?<=[。！？!?…])|(?<=…)/)
+        .map(s => s.replace(/^[。，、\s]+/, '').trim())
+        .filter(s => s && !/^[。！？!?…]+$/.test(s))
+        .join('\n');
+    }
+
+    const copyMenu = $('copyMenu');
+    $('btnCopy').addEventListener('click', e => {
+      e.stopPropagation();
+      const open = copyMenu.classList.toggle('hidden') === false;
+      $('btnCopy').setAttribute('aria-expanded', String(open));
+    });
+    copyMenu.addEventListener('click', e => {
+      const b = e.target.closest('[data-copy-format]');
+      if (!b || !currentData) return;
+      const fmt = b.dataset.copyFormat;
+      if (fmt === 'markdown') copyText(buildMarkdown(), '已複製 Notion／Markdown 格式');
+      else if (fmt === 'subtitle') copyText(buildSubtitles(), '已複製字幕稿，一句一行');
+      else copyText(buildScriptText(), '完整腳本已複製');
+      copyMenu.classList.add('hidden');
+      $('btnCopy').setAttribute('aria-expanded', 'false');
+    });
+    document.addEventListener('click', e => {
+      if (!copyMenu.contains(e.target) && e.target !== $('btnCopy')) copyMenu.classList.add('hidden');
+    });
 
     $('btnDownload').addEventListener('click', () => {
       if (!currentData) return;
-      const blob = new Blob([buildScriptText()], { type: 'text/plain;charset=utf-8' });
+      const blob = new Blob([buildMarkdown()], { type: 'text/markdown;charset=utf-8' });
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
-      a.download = `${currentData.title.slice(0, 20) || '短影音企劃'}.txt`;
+      a.download = `${currentData.title.slice(0, 20) || '短影音企劃'}.md`;
       a.click();
       URL.revokeObjectURL(a.href);
     });
@@ -450,7 +616,7 @@
     $('btnPreset').addEventListener('click', () => {
       presetIndex = (presetIndex + 1) % PRESETS.length;
       fillForm(PRESETS[presetIndex].input);
-      showResult(PRESETS[presetIndex].result, true);
+      addVersion(PRESETS[presetIndex].result, { isDemo: true });
       formNote.classList.add('hidden');
     });
 
@@ -464,63 +630,188 @@
       formNote.classList.add('hidden');
     });
 
-    planForm.addEventListener('submit', async e => {
-      e.preventDefault();
-      if (!$('topic').value.trim() && !$('coreContent').value.trim()) {
-        formNote.textContent = '至少寫一句你想拍的東西，或你最常聽到的抱怨';
-        formNote.classList.remove('hidden');
-        $('coreContent').focus();
-        return;
+    /* ---------- 呼叫後端 ---------- */
+    async function callApi(payload, timeoutMs = 70000) {
+      let res;
+      try {
+        res = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code: accessCode, ...payload }),
+          signal: AbortSignal.timeout(timeoutMs)
+        });
+      } catch (err) {
+        throw new Error(err.name === 'TimeoutError' ? 'AI 回應太久，請再按一次' : '網路連線中斷，請檢查網路後再試');
       }
-      const payload = {
-        code: accessCode,
+      let data;
+      try { data = await res.json(); } catch {
+        throw new Error(res.status === 504 ? 'AI 回應太久，請再按一次' : '伺服器沒有回應，請稍後再試');
+      }
+      if (res.status === 401) { logout('密碼已失效，請重新輸入'); const e = new Error('請重新登入'); e.silent = true; throw e; }
+      if (res.status === 429 && data.dailyLimit) setRemaining(0, data.dailyLimit);
+      if (!res.ok) throw new Error(data.error || '生成失敗');
+      return data;
+    }
+
+    function readForm() {
+      return {
         topic: $('topic').value.trim(),
         coreContent: $('coreContent').value.trim(),
         style: $('style').value,
         platform: $('platform').value,
         duration: document.querySelector('input[name="duration"]:checked').value
       };
+    }
 
-      formNote.classList.add('hidden');
+    /* ---------- 生成中的輪播文字 ---------- */
+    const LOADING_WORDS = ['正在拆解你的痛點…', '正在調配流量演算法與黃金密碼…', '正在寫三種講人話的開場…', '正在排分鏡與口白節奏…', '正在挑封面大字和標籤…'];
+    let loadingTimer = null;
+    function startLoading() {
+      let n = 0;
+      const w = $('loadingWord');
+      w.textContent = LOADING_WORDS[0];
+      w.classList.remove('is-out');
       resultState.classList.add('hidden');
       loadingState.classList.remove('hidden');
-      $('btnSubmit').disabled = true;
+      clearInterval(loadingTimer);
+      loadingTimer = setInterval(() => {
+        w.classList.add('is-out');
+        setTimeout(() => {
+          n = (n + 1) % LOADING_WORDS.length;
+          w.textContent = LOADING_WORDS[n];
+          w.classList.remove('is-out');
+        }, 600);
+      }, 2600);
+    }
+    function stopLoading() {
+      clearInterval(loadingTimer);
+      loadingState.classList.add('hidden');
+    }
 
+    async function generate(input) {
+      formNote.classList.add('hidden');
+      $('btnSubmit').disabled = true;
+      $('btnRewrite').disabled = true;
+      startLoading();
       try {
-        let res;
-        try {
-          res = await fetch('/api/generate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload),
-            signal: AbortSignal.timeout(70000)
-          });
-        } catch (err) {
-          throw new Error(err.name === 'TimeoutError' ? 'AI 回應太久，請再按一次生成' : '網路連線中斷，請檢查網路後再試');
-        }
-        let data;
-        try { data = await res.json(); } catch {
-          throw new Error(res.status === 504 ? 'AI 回應太久，請再按一次生成' : '伺服器沒有回應，請稍後再試');
-        }
-        if (res.status === 401) { logout('密碼已失效，請重新輸入'); return; }
-        if (res.status === 429) setRemaining(0, data.dailyLimit);
-        if (!res.ok) throw new Error(data.error || '生成失敗');
-        showResult(data.result, false);
+        const data = await callApi(input);
+        stopLoading();
+        addVersion(data.result, { style: input.style, input });
         setRemaining(data.remaining, data.dailyLimit);
         if (window.innerWidth < 1024) resultState.scrollIntoView({ behavior: 'smooth' });
       } catch (err) {
-        loadingState.classList.add('hidden');
+        stopLoading();
         resultState.classList.remove('hidden');
-        formNote.textContent = '生成沒有成功：' + err.message + '（目前先顯示原本的內容）';
-        formNote.classList.remove('hidden');
+        if (!err.silent) {
+          formNote.textContent = '生成沒有成功：' + err.message + '（目前先顯示原本的內容，這次不扣次數）';
+          formNote.classList.remove('hidden');
+        }
       } finally {
         $('btnSubmit').disabled = false;
+        $('btnRewrite').disabled = false;
       }
+    }
+
+    planForm.addEventListener('submit', e => {
+      e.preventDefault();
+      const input = readForm();
+      if (!input.topic && !input.coreContent) {
+        formNote.textContent = '至少寫一句你想拍的東西，或你最常聽到的抱怨';
+        formNote.classList.remove('hidden');
+        $('coreContent').focus();
+        return;
+      }
+      generate(input);
     });
+
+    /* ---------- 換語氣重寫 ---------- */
+    $('toneSwitch').innerHTML = [...$('style').options].map(o => `<option value="${esc(o.value)}">${esc(o.textContent)}</option>`).join('');
+    $('toneSwitch').value = '閨蜜掏心真心話/犀利共鳴';
+    $('btnRewrite').addEventListener('click', () => {
+      const v = versions[activeVersion];
+      const base = (v && v.input) || readForm();
+      if (!base.topic && !base.coreContent) {
+        formNote.textContent = '先在左邊寫下想拍的東西，再換語氣重寫';
+        formNote.classList.remove('hidden');
+        return;
+      }
+      const style = $('toneSwitch').value;
+      $('style').value = style;
+      generate({ ...base, style });
+    });
+
+    /* ---------- 只換一個開場（不扣每日次數） ---------- */
+    async function regenerateHook(i, btn) {
+      const d = currentData;
+      const v = versions[activeVersion];
+      if (!d || !d.hooks[i]) return;
+      const base = (v && v.input) || readForm();
+      btn.disabled = true;
+      btn.textContent = '換一句中…';
+      try {
+        const data = await callApi({
+          mode: 'hook',
+          ...base,
+          hookType: d.hooks[i].type,
+          angle: d.angle,
+          title: d.title,
+          avoid: d.hooks.map(h => h.line)
+        }, 45000);
+        if (data.hook && data.hook.line) {
+          d.hooks[i] = { type: data.hook.type || d.hooks[i].type, line: data.hook.line, visual: data.hook.visual || '' };
+          render(d);
+          toast('換好了');
+        }
+      } catch (err) {
+        if (!err.silent) toast(err.message);
+        btn.disabled = false;
+        btn.textContent = '↻ 換一句';
+      }
+    }
 
     /* ---------- 提詞器 ---------- */
     const tp = $('teleprompter'), tpScroll = $('tpScroll'), tpText = $('tpText');
-    let tpPlaying = false, tpLast = 0, tpPos = 0;
+    let tpPlaying = false, tpLast = 0, tpPos = 0, tpElapsed = 0, tpReadSec = 30, tpTarget = 30;
+    const READ_RATE = 4.5; // 中文口語大約每秒 4 到 5 個字
+
+    const countChars = s => (String(s || '').match(/[一-鿿A-Za-z0-9]/g) || []).length;
+    const fmtTime = s => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+
+    function updateBudget() {
+      const d = currentData;
+      const h = d.hooks[selectedHook];
+      const chars = countChars(h ? h.line : '') + d.storyboard.reduce((n, s) => n + countChars(s.audio), 0) + countChars(d.cta);
+      tpReadSec = Math.max(5, Math.round(chars / READ_RATE));
+      tpTarget = parseInt(d.estimatedTime, 10) || 30;
+      const ratio = tpReadSec / tpTarget;
+      const pct = Math.min(100, Math.round(ratio * 100));
+      const over = ratio > 1.15, under = ratio < 0.75;
+      $('tpChars').textContent = chars;
+      $('tpRead').textContent = tpReadSec;
+      $('tpTarget').textContent = tpTarget;
+      $('tpBar').style.width = pct + '%';
+      $('tpBar').style.background = over ? '#C9785F' : 'rgb(var(--c-accent))';
+      $('tpBudgetNote').textContent = over
+        ? `比目標多約 ${tpReadSec - tpTarget} 秒，建議刪一兩句或用「快節奏」`
+        : under ? '比目標短，可以講慢一點或多停頓' : '長度剛好';
+    }
+
+    // 依「正常」速度算出剛好在念完時捲完
+    function speedFor(preset) {
+      const distance = Math.max(200, tpScroll.scrollHeight - tpScroll.clientHeight);
+      const base = distance / tpReadSec;
+      return base * ({ slow: 0.8, normal: 1, fast: 1.25 }[preset] || 1);
+    }
+
+    function setPreset(preset) {
+      $('tpSpeed').value = Math.round(speedFor(preset));
+      document.querySelectorAll('[data-tp-preset]').forEach(b => {
+        const on = b.dataset.tpPreset === preset;
+        b.classList.toggle('bg-editorial-accent', on);
+        b.classList.toggle('text-white', on);
+        b.classList.toggle('bg-white/10', !on);
+      });
+    }
 
     function openPrompter() {
       if (!currentData) return;
@@ -538,7 +829,10 @@
       applyTpSettings();
       tp.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
-      tpScroll.scrollTop = 0; tpPos = 0;
+      tpScroll.scrollTop = 0; tpPos = 0; tpElapsed = 0;
+      updateBudget();
+      $('tpClock').textContent = `${fmtTime(0)} / ${fmtTime(tpTarget)}`;
+      requestAnimationFrame(() => setPreset('normal'));
     }
 
     function applyTpSettings() {
@@ -549,8 +843,13 @@
     function tpStep(t) {
       if (!tpPlaying) return;
       if (tpLast) {
-        tpPos += Number($('tpSpeed').value) * (t - tpLast) / 1000;
+        const dt = (t - tpLast) / 1000;
+        tpElapsed += dt;
+        tpPos += Number($('tpSpeed').value) * dt;
         tpScroll.scrollTop = tpPos;
+        const clock = $('tpClock');
+        clock.textContent = `${fmtTime(tpElapsed)} / ${fmtTime(tpTarget)}`;
+        clock.style.color = tpElapsed > tpTarget ? '#E3A08A' : '';
         if (tpScroll.scrollTop + tpScroll.clientHeight >= tpScroll.scrollHeight - 2) { setPlaying(false); return; }
       }
       tpLast = t;
@@ -567,8 +866,16 @@
 
     $('btnTeleprompter').addEventListener('click', openPrompter);
     $('tpPlay').addEventListener('click', () => setPlaying(!tpPlaying));
-    $('tpRestart').addEventListener('click', () => { tpScroll.scrollTop = 0; tpPos = 0; });
-    $('tpSize').addEventListener('input', applyTpSettings);
+    $('tpRestart').addEventListener('click', () => {
+      tpScroll.scrollTop = 0; tpPos = 0; tpElapsed = 0;
+      $('tpClock').textContent = `${fmtTime(0)} / ${fmtTime(tpTarget)}`;
+      $('tpClock').style.color = '';
+    });
+    document.querySelectorAll('[data-tp-preset]').forEach(b => b.addEventListener('click', () => setPreset(b.dataset.tpPreset)));
+    $('tpSpeed').addEventListener('input', () => document.querySelectorAll('[data-tp-preset]').forEach(b => {
+      b.classList.remove('bg-editorial-accent', 'text-white'); b.classList.add('bg-white/10');
+    }));
+    $('tpSize').addEventListener('input', () => { applyTpSettings(); });
     $('tpMirror').addEventListener('change', applyTpSettings);
     tpScroll.addEventListener('scroll', () => { if (!tpPlaying) tpPos = tpScroll.scrollTop; });
     $('btnCloseTp').addEventListener('click', () => {
@@ -579,7 +886,7 @@
 
     /* ---------- 開啟時先帶入範例 ---------- */
     fillForm(PRESETS[0].input);
-    showResult(PRESETS[0].result, true);
+    addVersion(PRESETS[0].result, { isDemo: true });
 
     /* ---------- 密碼門與會員資訊 ---------- */
     const STORE_KEY = 'sv_access_code';
