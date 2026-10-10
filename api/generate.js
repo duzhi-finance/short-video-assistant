@@ -2,7 +2,8 @@
 import { isValidCode, getUsage, addUsage, DAILY_LIMIT } from './_access.js';
 
 // 模型名稱。Google 換新模型時，在 Vercel 環境變數設定 GEMINI_MODEL 就能更換，不用改程式
-const MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
+// 預設用速度快、成本低的 Flash-Lite；想要更強的模型可設 GEMINI_MODEL=gemini-3.8-flash（比較慢）
+const MODEL = process.env.GEMINI_MODEL || 'gemini-3.5-flash-lite';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
