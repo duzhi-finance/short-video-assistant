@@ -1,5 +1,5 @@
-// 放在 Vercel 專案的 api/generate.js
-// 環境變數：在 Vercel 後台 Settings → Environment Variables 新增 GEMINI_API_KEY
+// 生成企劃。環境變數：GEMINI_API_KEY（必填），密碼與次數設定見 _access.js
+import { isValidCode, getUsage, addUsage, DAILY_LIMIT } from './_access.js';
 
 const MODEL = 'gemini-2.5-flash'; // 如果 Google 改了模型名稱，改這裡就好
 
@@ -13,7 +13,21 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: '後端沒有設定 GEMINI_API_KEY' });
   }
 
-  const { topic, coreContent, style, duration, platform = '全平台通用' } = req.body || {};
+  const { code, topic, coreContent, style, duration, platform = '全平台通用' } = req.body || {};
+
+  if (!isValidCode(code)) {
+    return res.status(401).json({ error: '密碼無效，請重新輸入' });
+  }
+
+  try {
+    const { remaining } = await getUsage(code);
+    if (remaining === 0) {
+      return res.status(429).json({ error: `今天的 ${DAILY_LIMIT} 次已經用完，明天 00:00 會恢復` });
+    }
+  } catch {
+    // 計次服務暫時出問題時不擋生成
+  }
+
   if (!topic || !coreContent) {
     return res.status(400).json({ error: '請填寫主題與核心內容' });
   }
@@ -88,7 +102,10 @@ export default async function handler(req, res) {
       return res.status(500).json({ error: 'AI 回傳格式不完整，請再試一次' });
     }
 
-    return res.status(200).json({ result });
+    let usage = { remaining: null };
+    try { usage = await addUsage(code); } catch {}
+
+    return res.status(200).json({ result, remaining: usage.remaining, dailyLimit: DAILY_LIMIT });
   } catch (err) {
     return res.status(500).json({ error: '生成失敗：' + err.message });
   }

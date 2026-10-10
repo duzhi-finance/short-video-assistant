@@ -5,48 +5,65 @@ const SITE = {
   name: '短影音爆款企劃大師',
   price: 990,              // 一次買斷價格（新台幣），請改成你的定價
   originalPrice: 1490,     // 原價（顯示劃線用），不需要就設成 0
-  dailyLimit: 20,          // 每個帳號每天可生成次數
+  dailyLimit: 20,          // 每組密碼每天可生成次數（後端 DAILY_LIMIT 也要設一樣）
   paymentReady: false,     // 綠界金流串好之後改成 true
   checkoutUrl: '',         // 之後放付款網址或 API 路徑
   contactEmail: ''         // 客服信箱，請填寫
 };
 
 /* ---------- 共用頁首 ---------- */
-function renderHeader(active) {
+function renderHeader(page) {
   const el = document.getElementById('site-header');
   if (!el) return;
-  const link = (href, label, key) =>
-    `<a href="${href}" class="px-3 py-2 rounded-full text-sm transition ${active === key
-      ? 'bg-editorial-card text-editorial-dark font-medium'
-      : 'text-editorial-muted hover:text-editorial-dark'}">${label}</a>`;
-  el.innerHTML = `
-    <header class="sticky z-40 bg-editorial-bg/90 backdrop-blur border-b border-editorial-border/70" style="top: env(safe-area-inset-top, 0px)">
+  const brand = `
+    <a href="${page === 'app' ? '/app' : '#'}" class="flex items-baseline gap-2 min-w-0">
+      <span class="font-display italic text-editorial-accent text-lg leading-none">S</span>
+      <span class="font-serif font-bold text-base md:text-lg truncate">${SITE.name}</span>
+    </a>`;
+  const shell = inner => `
+    <header class="sticky z-40 bg-editorial-bg/90 backdrop-blur border-b border-editorial-border/70" style="top: env(safe-area-inset-top, 0px)">${inner}</header>`;
+
+  // 工具頁：只放品牌名稱與會員狀態
+  if (page === 'app') {
+    el.innerHTML = shell(`
       <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
-        <a href="/" class="flex items-baseline gap-2 min-w-0">
-          <span class="font-display italic text-editorial-accent text-lg leading-none">S</span>
-          <span class="font-serif font-bold text-base md:text-lg truncate">${SITE.name}</span>
-        </a>
-        <nav class="hidden md:flex items-center gap-1">
-          ${link('/#features', '功能', 'features')}
-          ${link('/#pricing', '方案', 'pricing')}
-          ${link('/app', '開始使用', 'app')}
-          ${link('/account', '會員中心', 'account')}
-        </nav>
+        ${brand}
+        <div id="memberSlot" class="flex items-center gap-2"></div>
+      </div>`);
+    return;
+  }
+
+  // 銷售頁：單頁錨點導覽
+  const link = (href, label) =>
+    `<a href="${href}" class="px-3 py-2 rounded-full text-sm text-editorial-muted hover:text-editorial-dark transition">${label}</a>`;
+  const links = link('#features', '功能') + link('#pricing', '方案') + link('#faq', '常見問題') + link('#policies', '條款');
+  el.innerHTML = shell(`
+      <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+        ${brand}
+        <nav class="hidden md:flex items-center gap-1">${links}</nav>
         <div class="flex items-center gap-2">
-          <a href="/#pricing" class="hidden sm:inline-flex text-xs bg-editorial-dark hover:bg-editorial-accent text-white px-4 py-2 rounded-full transition">立即購買</a>
+          <a href="/app" class="hidden sm:inline-flex text-xs border border-editorial-border hover:border-editorial-accent bg-white px-4 py-2 rounded-full transition">已購買？進入工具</a>
+          <a href="#pricing" class="inline-flex text-xs bg-editorial-dark hover:bg-editorial-accent text-white px-4 py-2 rounded-full transition">立即購買</a>
           <button id="menuBtn" class="md:hidden w-10 h-10 rounded-full border border-editorial-border flex items-center justify-center" aria-label="開啟選單">☰</button>
         </div>
       </div>
       <nav id="mobileMenu" class="md:hidden hidden border-t border-editorial-border/70 px-4 py-3 flex flex-col gap-1">
-        ${link('/#features', '功能', 'features')}
-        ${link('/#pricing', '方案', 'pricing')}
-        ${link('/app', '開始使用', 'app')}
-        ${link('/account', '會員中心', 'account')}
-      </nav>
-    </header>`;
-  document.getElementById('menuBtn').addEventListener('click', () => {
-    document.getElementById('mobileMenu').classList.toggle('hidden');
-  });
+        ${links}
+        <a href="/app" class="px-3 py-2 rounded-full text-sm text-editorial-accentHover">已購買？進入工具 →</a>
+      </nav>`);
+  const menu = document.getElementById('mobileMenu');
+  document.getElementById('menuBtn').addEventListener('click', () => menu.classList.toggle('hidden'));
+  menu.addEventListener('click', e => { if (e.target.closest('a')) menu.classList.add('hidden'); });
+}
+
+/* ---------- 連到條款時自動展開 ---------- */
+function openPolicyFromHash() {
+  const id = location.hash.slice(1);
+  const el = id && document.getElementById(id);
+  if (el && el.tagName === 'DETAILS') {
+    el.open = true;
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
 }
 
 /* ---------- 共用頁尾 ---------- */
@@ -61,11 +78,10 @@ function renderFooter() {
           <p class="font-display italic text-xs text-editorial-muted mt-1">Written for creators who want it to feel real.</p>
         </div>
         <div class="flex flex-wrap gap-x-5 gap-y-2 text-xs text-editorial-muted">
-          <a href="/app" class="hover:text-editorial-dark">開始使用</a>
-          <a href="/account" class="hover:text-editorial-dark">會員中心</a>
-          <a href="/terms" class="hover:text-editorial-dark">服務條款</a>
-          <a href="/terms#privacy" class="hover:text-editorial-dark">隱私權政策</a>
-          <a href="/terms#refund" class="hover:text-editorial-dark">退款政策</a>
+          <a href="/#terms" class="hover:text-editorial-dark">服務條款</a>
+          <a href="/#privacy" class="hover:text-editorial-dark">隱私權政策</a>
+          <a href="/#refund" class="hover:text-editorial-dark">退款政策</a>
+          <span>客服信箱：<span data-contact class="select-all"></span></span>
         </div>
       </div>
       <p class="text-center text-[11px] text-editorial-muted pb-8">© ${new Date().getFullYear()} ${SITE.name}</p>
@@ -120,4 +136,6 @@ document.addEventListener('DOMContentLoaded', () => {
   renderFooter();
   fillPrices();
   bindBuyButtons();
+  openPolicyFromHash();
+  window.addEventListener('hashchange', openPolicyFromHash);
 });

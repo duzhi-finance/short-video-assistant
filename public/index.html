@@ -28,7 +28,7 @@
         </p>
         <div class="flex flex-wrap gap-3 mt-8">
           <a href="#pricing" class="bg-editorial-dark hover:bg-editorial-accent text-white text-sm px-6 py-3.5 rounded-full transition shadow-md">立即購買 · <span data-price></span></a>
-          <a href="/app" class="border border-editorial-border hover:border-editorial-accent bg-white text-sm px-6 py-3.5 rounded-full transition">先看範例成果</a>
+          <a href="#features" class="border border-editorial-border hover:border-editorial-accent bg-white text-sm px-6 py-3.5 rounded-full transition">看看能做什麼</a>
         </div>
         <p class="text-xs text-editorial-muted mt-4">一次買斷，不用月費</p>
       </div>
@@ -129,7 +129,7 @@
             <h3 class="font-serif font-bold text-lg mt-2">口白像真人在說話</h3>
             <p class="text-sm text-white/70 mt-2 leading-relaxed">台灣用語、自然語氣，沒有廣告腔。業配也能拍得像真心分享。</p>
           </div>
-          <a href="/app" class="mt-5 text-sm text-editorial-accent hover:text-white transition">看範例成果 →</a>
+          <a href="#pricing" class="mt-5 text-sm text-editorial-accent hover:text-white transition">查看方案 →</a>
         </article>
       </div>
     </section>
@@ -176,14 +176,18 @@
           <li class="flex gap-3"><span class="text-editorial-accent">✓</span>手機提詞器，可調速度、字級與鏡像</li>
           <li class="flex gap-3"><span class="text-editorial-accent">✓</span>一鍵複製、匯出完整腳本</li>        </ul>
         <button data-buy class="w-full mt-8 bg-editorial-dark hover:bg-editorial-accent text-white py-4 rounded-2xl transition font-medium tracking-wide">立即購買</button>
-        <p class="text-[11px] text-editorial-muted text-center mt-3 leading-relaxed">購買前請先閱讀 <a href="/terms#refund" class="underline underline-offset-2">退款政策</a></p>
+        <p class="text-[11px] text-editorial-muted text-center mt-3 leading-relaxed">購買前請先閱讀 <a href="#refund" class="underline underline-offset-2">退款政策</a></p>
       </div>
     </section>
 
     <!-- FAQ -->
-    <section class="max-w-3xl mx-auto px-4 py-14">
+    <section id="faq" class="max-w-3xl mx-auto px-4 py-14 scroll-mt-20">
       <h2 class="font-serif font-bold text-2xl text-center mb-8">常見問題</h2>
       <div class="grid gap-3">
+        <details class="bg-white rounded-2xl border border-editorial-border p-5 group">
+          <summary class="font-semibold cursor-pointer list-none flex justify-between items-center gap-4">買完之後要怎麼開始用？<span class="text-editorial-accent group-open:rotate-45 transition">＋</span></summary>
+          <p class="text-sm text-editorial-muted mt-3 leading-relaxed">付款完成後，你會收到工具網址和一組專屬密碼。打開網址、輸入密碼就能開始生成，同一台裝置之後會自動記住，不用每次輸入。</p>
+        </details>
         <details class="bg-white rounded-2xl border border-editorial-border p-5 group">
           <summary class="font-semibold cursor-pointer list-none flex justify-between items-center gap-4">買斷之後真的不用再付錢嗎？<span class="text-editorial-accent group-open:rotate-45 transition">＋</span></summary>
           <p class="text-sm text-editorial-muted mt-3 leading-relaxed">對，付一次就能一直使用。每天有 <span data-daily-limit></span> 次生成額度，隔天自動恢復，一般創作者每天拍 1 到 3 支，非常夠用。</p>
@@ -210,8 +214,78 @@
         <h2 class="font-serif font-bold text-2xl md:text-4xl mt-2">下一支影片，今天就拍</h2>
         <div class="flex flex-wrap justify-center gap-3 mt-7">
           <button data-buy class="bg-editorial-accent hover:bg-editorial-accentHover text-white text-sm px-7 py-3.5 rounded-full transition">立即購買 · <span data-price></span></button>
-          <a href="/app" class="border border-white/30 hover:border-white text-sm px-7 py-3.5 rounded-full transition">先看範例</a>
+          <a href="#faq" class="border border-white/30 hover:border-white text-sm px-7 py-3.5 rounded-full transition">常見問題</a>
         </div>
+      </div>
+    </section>
+
+    <!-- 條款（綠界審核需要在網站上看得到） -->
+    <section id="policies" class="max-w-3xl mx-auto px-4 pt-16 scroll-mt-20">
+      <p class="font-display italic text-editorial-accent text-sm text-center">Terms</p>
+      <h2 class="font-serif font-bold text-2xl text-center mt-1">服務條款與政策</h2>
+      <p class="text-xs text-editorial-muted text-center mt-2">最後更新：<span class="fill-in">2026 年 ○ 月 ○ 日</span></p>
+      <div class="grid gap-3 mt-8">
+        <details id="terms" class="policy bg-white rounded-2xl border border-editorial-border scroll-mt-24 group">
+          <summary class="cursor-pointer list-none flex justify-between items-center gap-4 p-5">
+            <span class="font-serif font-bold text-lg">服務條款</span><span class="text-editorial-accent group-open:rotate-45 transition">＋</span>
+          </summary>
+          <div class="prose-terms px-5 md:px-7 pb-6 -mt-2">
+        <h3>一、服務提供者</h3>
+        <p>本網站「短影音爆款企劃大師」由 <span class="fill-in">賣家姓名或公司名稱</span>（以下稱「本服務」）經營。客服信箱：<span data-contact class="select-all"></span>。</p>
+
+        <h3>二、服務內容</h3>
+        <p>本服務使用 AI 依使用者輸入的主題與內容，產生短影音企劃，包括開場台詞、分鏡口白、結尾互動句、封面標題與標籤建議，並提供提詞器功能。</p>
+
+        <h3>三、帳號與使用規範</h3>
+        <ol>
+          <li>每組使用密碼限購買者本人使用，不得轉售、出租或與他人共用。</li>
+          <li>每組密碼每日可生成 <span data-daily-limit></span> 份企劃，額度於每日 00:00（台灣時間）重置。</li>
+          <li>不得輸入違法、侵權或違反平台規範的內容，也不得以程式大量自動化呼叫本服務。</li>
+          <li>違反上述規範者，本服務得停用該組密碼，已付費用不予退還。</li>
+        </ol>
+
+        <h3>四、生成內容</h3>
+        <ol>
+          <li>生成的內容由使用者自由使用於個人或商業影片。</li>
+          <li>AI 生成內容僅供參考，發布前請使用者自行確認內容正確性，以及是否符合各平台、廣告與業配揭露相關規範。</li>
+          <li>本服務不保證影片的觀看數、互動數或銷售成效。</li>
+        </ol>
+
+        <h3>五、服務變更與中止</h3>
+        <p>本服務得因維護、系統升級或不可抗力因素暫停服務。若本服務永久停止營運，將於 <span class="fill-in">30</span> 日前於網站公告。</p>
+          </div>
+        </details>
+        <details id="privacy" class="policy bg-white rounded-2xl border border-editorial-border scroll-mt-24 group">
+          <summary class="cursor-pointer list-none flex justify-between items-center gap-4 p-5">
+            <span class="font-serif font-bold text-lg">隱私權政策</span><span class="text-editorial-accent group-open:rotate-45 transition">＋</span>
+          </summary>
+          <div class="prose-terms px-5 md:px-7 pb-6 -mt-2">
+        <h3>一、蒐集的資料</h3>
+        <ul>
+          <li>購買資料：付款時填寫的姓名與 Email，用於寄送使用密碼與電子發票。</li>
+          <li>付款：付款由第三方金流（綠界科技）處理，本服務不會取得或儲存你的信用卡卡號。</li>
+          <li>使用紀錄：你輸入的主題、內容與生成結果，用於提供服務與改善品質。</li>
+        </ul>
+        <h3>二、資料使用與分享</h3>
+        <p>你輸入的內容會傳送給 AI 服務供應商以產生企劃。除法律要求外，本服務不會將你的個人資料出售或提供給其他第三方。</p>
+        <h3>三、你的權利</h3>
+        <p>你可以隨時來信要求查詢、更正或刪除你的個人資料與生成紀錄。</p>
+          </div>
+        </details>
+        <details id="refund" class="policy bg-white rounded-2xl border border-editorial-border scroll-mt-24 group">
+          <summary class="cursor-pointer list-none flex justify-between items-center gap-4 p-5">
+            <span class="font-serif font-bold text-lg">退款政策</span><span class="text-editorial-accent group-open:rotate-45 transition">＋</span>
+          </summary>
+          <div class="prose-terms px-5 md:px-7 pb-6 -mt-2">
+        <p>本服務為「非以有形媒介提供之數位內容」及「一經提供即為完成之線上服務」。依《通訊交易解除權合理例外情事適用準則》，購買時須經你勾選同意，同意後即不適用七日猶豫期。</p>
+        <ol>
+          <li>購買後尚未使用任何一次生成功能，可於付款後 <span class="fill-in">7</span> 日內來信申請全額退款。</li>
+          <li>已使用生成功能者，恕不退款。</li>
+          <li>因本服務系統問題導致無法使用超過 <span class="fill-in">7</span> 日，可申請全額退款。</li>
+          <li>退款將以原付款方式退回，作業時間約 <span class="fill-in">7–14</span> 個工作天。</li>
+        </ol>
+          </div>
+        </details>
       </div>
     </section>
   </main>

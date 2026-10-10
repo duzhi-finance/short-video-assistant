@@ -18,13 +18,55 @@
 </head>
 <body data-page="app" class="antialiased min-h-screen selection:bg-editorial-accent selection:text-white">
   <div id="site-header"></div>
-  <div class="max-w-6xl mx-auto px-4 py-10 md:py-14">
 
-    <!-- Page heading -->
-    <div class="mb-8 md:mb-10">
-      <p class="font-display italic text-editorial-accent text-sm">The Planner</p>
-      <h1 class="font-serif font-bold text-3xl md:text-4xl mt-1">開始企劃</h1>
-      <p class="text-editorial-muted text-sm mt-2">右邊先放了一份範例，填好左邊再按生成，就會換成你的企劃。</p>
+  <!-- 密碼門：付款後才拿得到密碼 -->
+  <section id="gate" class="max-w-md mx-auto px-4 py-16 md:py-24">
+    <div id="gateChecking" class="text-center text-sm text-editorial-muted py-10">
+      <div class="w-7 h-7 mx-auto border-2 border-editorial-accent border-t-transparent rounded-full animate-spin mb-3"></div>
+      確認中…
+    </div>
+    <form id="gateForm" class="hidden bg-white rounded-3xl border border-editorial-border shadow-sm p-7 md:p-8">
+      <p class="font-display italic text-editorial-accent text-sm">Members only</p>
+      <h1 class="font-serif font-bold text-2xl md:text-3xl mt-1">輸入你的使用密碼</h1>
+      <p class="text-sm text-editorial-muted mt-3 leading-relaxed">密碼在付款完成的通知裡。輸入一次之後，這台裝置會自動記住。</p>
+      <label for="gateCode" class="sr-only">使用密碼</label>
+      <input id="gateCode" type="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="例如 SV-7K3P-Q9ME"
+        class="w-full mt-6 text-base tracking-widest font-medium text-center p-4 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none uppercase">
+      <p id="gateError" class="hidden text-xs text-[#A4482F] mt-3 text-center"></p>
+      <button id="gateBtn" type="submit" class="w-full mt-4 bg-editorial-dark hover:bg-editorial-accent text-white py-4 rounded-2xl transition font-medium tracking-wide disabled:opacity-60">進入工具</button>
+      <div class="rule my-6"></div>
+      <p class="text-xs text-editorial-muted text-center leading-relaxed">
+        還沒購買？<a href="/#pricing" class="text-editorial-accentHover underline underline-offset-2">查看方案</a><br>
+        找不到密碼請來信 <span data-contact class="select-all"></span>
+      </p>
+    </form>
+  </section>
+
+  <div id="toolArea" class="hidden max-w-6xl mx-auto px-4 py-10 md:py-14">
+
+    <!-- Page heading + 會員資訊 -->
+    <div class="mb-8 md:mb-10 flex flex-col md:flex-row md:items-end md:justify-between gap-5">
+      <div>
+        <p class="font-display italic text-editorial-accent text-sm">The Planner</p>
+        <h1 class="font-serif font-bold text-3xl md:text-4xl mt-1">開始企劃</h1>
+        <p class="text-editorial-muted text-sm mt-2">右邊先放了一份範例，填好左邊再按生成，就會換成你的企劃。</p>
+      </div>
+      <aside class="bg-white rounded-2xl border border-editorial-border px-5 py-4 flex items-center gap-5 self-start md:self-auto">
+        <div>
+          <p class="text-[11px] tracking-widest text-editorial-muted">方案</p>
+          <p class="font-serif font-bold">完整版</p>
+        </div>
+        <div class="w-px self-stretch bg-editorial-border"></div>
+        <div>
+          <p class="text-[11px] tracking-widest text-editorial-muted">今日剩餘</p>
+          <p class="font-serif font-bold tabular-nums"><span id="remainingText">—</span></p>
+        </div>
+        <div class="w-px self-stretch bg-editorial-border"></div>
+        <div>
+          <p class="text-[11px] tracking-widest text-editorial-muted">密碼</p>
+          <p class="font-medium text-sm tabular-nums" id="codeHint">—</p>
+        </div>
+      </aside>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
@@ -392,6 +434,7 @@
     planForm.addEventListener('submit', async e => {
       e.preventDefault();
       const payload = {
+        code: accessCode,
         topic: $('topic').value.trim(),
         coreContent: $('coreContent').value.trim(),
         style: $('style').value,
@@ -412,8 +455,11 @@
         });
         let data;
         try { data = await res.json(); } catch { throw new Error('伺服器沒有回應，請稍後再試'); }
+        if (res.status === 401) { logout('密碼已失效，請重新輸入'); return; }
+        if (res.status === 429) setRemaining(0, data.dailyLimit);
         if (!res.ok) throw new Error(data.error || '生成失敗');
         showResult(data.result, false);
+        setRemaining(data.remaining, data.dailyLimit);
         if (window.innerWidth < 1024) resultState.scrollIntoView({ behavior: 'smooth' });
       } catch (err) {
         loadingState.classList.add('hidden');
@@ -487,6 +533,105 @@
     /* ---------- 開啟時先帶入範例 ---------- */
     fillForm(PRESETS[0].input);
     showResult(PRESETS[0].result, true);
+
+    /* ---------- 密碼門與會員資訊 ---------- */
+    const STORE_KEY = 'sv_access_code';
+    let accessCode = '';
+
+    const store = {
+      get() { try { return localStorage.getItem(STORE_KEY) || ''; } catch { return ''; } },
+      set(v) { try { localStorage.setItem(STORE_KEY, v); } catch {} },
+      clear() { try { localStorage.removeItem(STORE_KEY); } catch {} }
+    };
+
+    function setRemaining(remaining, limit) {
+      const el = $('remainingText');
+      if (remaining === null || remaining === undefined) { el.textContent = '不限'; return; }
+      el.textContent = `${remaining} / ${limit || SITE.dailyLimit}`;
+      el.classList.toggle('text-[#A4482F]', remaining === 0);
+    }
+
+    function renderMemberSlot() {
+      const slot = $('memberSlot');
+      if (!slot) return;
+      slot.innerHTML = `
+        <span class="hidden sm:inline text-xs px-3 py-1.5 rounded-full bg-editorial-card border border-editorial-border text-editorial-accentHover">完整版會員</span>
+        <button id="btnLogout" class="text-xs border border-editorial-border hover:border-editorial-accent bg-white px-3 py-1.5 rounded-full transition">登出</button>`;
+      $('btnLogout').addEventListener('click', () => logout('已登出這台裝置'));
+    }
+
+    function enterTool(code, info) {
+      accessCode = code;
+      store.set(code);
+      $('codeHint').textContent = '••••' + code.slice(-4);
+      setRemaining(info.remaining, info.dailyLimit);
+      $('gate').classList.add('hidden');
+      $('toolArea').classList.remove('hidden');
+      renderMemberSlot();
+    }
+
+    function showGate(message) {
+      $('gateChecking').classList.add('hidden');
+      $('gateForm').classList.remove('hidden');
+      $('gate').classList.remove('hidden');
+      $('toolArea').classList.add('hidden');
+      const slot = $('memberSlot');
+      if (slot) slot.innerHTML = '';
+      const err = $('gateError');
+      err.textContent = message || '';
+      err.classList.toggle('hidden', !message);
+      $('gateCode').focus();
+    }
+
+    function logout(message) {
+      accessCode = '';
+      store.clear();
+      $('gateCode').value = '';
+      showGate(message);
+    }
+
+    async function verify(code) {
+      const res = await fetch('/api/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code })
+      });
+      let data = {};
+      try { data = await res.json(); } catch { throw new Error('伺服器沒有回應，請稍後再試'); }
+      if (!res.ok || !data.ok) {
+        const e = new Error(data.error || '密碼不正確');
+        e.invalid = res.status === 401;
+        throw e;
+      }
+      return data;
+    }
+
+    $('gateForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const code = $('gateCode').value.trim().toUpperCase();
+      if (!code) { showGate('請輸入密碼'); return; }
+      $('gateBtn').disabled = true;
+      $('gateBtn').textContent = '確認中…';
+      try {
+        enterTool(code, await verify(code));
+      } catch (err) {
+        showGate(err.message);
+      } finally {
+        $('gateBtn').disabled = false;
+        $('gateBtn').textContent = '進入工具';
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const saved = store.get();
+      if (!saved) { showGate(); return; }
+      try {
+        enterTool(saved, await verify(saved));
+      } catch (err) {
+        if (err.invalid) logout('這組密碼已失效，請重新輸入');
+        else showGate(err.message);
+      }
+    });
   </script>
   <div id="site-footer"></div>
 </body>
