@@ -16,15 +16,15 @@ function renderHeader(page) {
   const el = document.getElementById('site-header');
   if (!el) return;
   const brand = `
-    <a href="${page === 'app' ? '/app' : '#'}" class="flex items-baseline gap-2 min-w-0">
+    <a href="${page === 'app' ? '/app' : page === 'admin' ? '/admin' : '#'}" class="flex items-baseline gap-2 min-w-0">
       <span class="font-display italic text-editorial-accent text-lg leading-none">S</span>
       <span class="font-serif font-bold text-base md:text-lg truncate">${SITE.name}</span>
     </a>`;
   const shell = inner => `
     <header class="sticky z-40 bg-editorial-bg/90 backdrop-blur border-b border-editorial-border/70" style="top: env(safe-area-inset-top, 0px)">${inner}</header>`;
 
-  // 工具頁：只放品牌名稱與會員狀態
-  if (page === 'app') {
+  // 工具頁、管理後台：只放品牌名稱與右側狀態
+  if (page === 'app' || page === 'admin') {
     el.innerHTML = shell(`
       <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
         ${brand}

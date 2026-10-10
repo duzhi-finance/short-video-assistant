@@ -1,62 +1,121 @@
-// 密碼驗證與每日次數（檔名以底線開頭，Vercel 不會把它當成網址）
+// 密碼驗證、每日次數、密碼管理（檔名以底線開頭，Vercel 不會把它當成網址）
 //
 // Vercel 環境變數：
-//   ACCESS_CODES   必填。有效密碼清單，用逗號或換行分隔，例如：SV-7K3P-Q9ME,SV-M2XD-4HTA
-//   DAILY_LIMIT    選填。每組密碼每天可生成次數，預設 20
 //   UPSTASH_REDIS_REST_URL / UPSTASH_REDIS_REST_TOKEN
-//                  選填。有設定才會計算每日次數（Vercel Marketplace 加 Upstash Redis 會自動帶入，
-//                  也接受 KV_REST_API_URL / KV_REST_API_TOKEN）。沒設定時不限次數。
+//                  在 Vercel 專案 Storage 加上 Upstash Redis 會自動帶入
+//                  （也接受 KV_REST_API_URL / KV_REST_API_TOKEN）。
+//                  用來存放後台產生的密碼與每日次數。
+//   ADMIN_PASSWORD 管理後台 /admin 的登入密碼
+//   DAILY_LIMIT    選填。每組密碼每天可生成次數，預設 20
+//   ACCESS_CODES   選填。固定密碼清單（逗號分隔），不需要後台也能用，適合自己測試
 
-import { createHash } from 'node:crypto';
+import { createHash, randomInt, timingSafeEqual } from 'node:crypto';
 
 export const DAILY_LIMIT = Number(process.env.DAILY_LIMIT) || 20;
 
-const normalize = code => String(code || '').trim().toUpperCase();
-
-export function isValidCode(code) {
-  const c = normalize(code);
-  if (!c) return false;
-  const list = (process.env.ACCESS_CODES || '')
-    .split(/[\s,]+/)
-    .map(normalize)
-    .filter(Boolean);
-  return list.includes(c);
-}
-
 const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
-export const usageTracked = Boolean(REDIS_URL && REDIS_TOKEN);
+export const redisReady = Boolean(REDIS_URL && REDIS_TOKEN);
 
-// 台灣時間的今天日期，額度每天 00:00 重置
+export const normalize = code => String(code || '').trim().toUpperCase();
+
+/* ---------- Redis（Upstash REST） ---------- */
+export async function redis(...args) {
+  const res = await fetch(REDIS_URL, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${REDIS_TOKEN}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify(args.map(String))
+  });
+  const data = await res.json();
+  if (!res.ok || data.error) throw new Error(data.error || '資料庫連線失敗');
+  return data.result;
+}
+
+const codeKey = code => `code:${normalize(code)}`;
+
+function envCodes() {
+  return (process.env.ACCESS_CODES || '').split(/[\s,]+/).map(normalize).filter(Boolean);
+}
+
+/* ---------- 驗證 ---------- */
+export async function isValidCode(code) {
+  const c = normalize(code);
+  if (!c) return false;
+  if (envCodes().includes(c)) return true;
+  if (!redisReady) return false;
+  const raw = await redis('GET', codeKey(c));
+  if (!raw) return false;
+  try { return JSON.parse(raw).active !== false; } catch { return false; }
+}
+
+/* ---------- 每日次數 ---------- */
 function todayTW() {
   return new Date(Date.now() + 8 * 3600 * 1000).toISOString().slice(0, 10);
 }
 
-function usageKey(code) {
+export function usageKey(code) {
   const id = createHash('sha256').update(normalize(code)).digest('hex').slice(0, 16);
   return `usage:${todayTW()}:${id}`;
 }
 
-async function redis(...parts) {
-  const res = await fetch(`${REDIS_URL}/${parts.map(encodeURIComponent).join('/')}`, {
-    headers: { Authorization: `Bearer ${REDIS_TOKEN}` }
-  });
-  const data = await res.json();
-  if (!res.ok || data.error) throw new Error(data.error || 'Redis 連線失敗');
-  return data.result;
-}
-
-// 回傳 { used, remaining }；沒有設定 Redis 時 remaining 為 null（不限次數）
+// 回傳 { used, remaining }；沒有資料庫時 remaining 為 null（不限次數）
 export async function getUsage(code) {
-  if (!usageTracked) return { used: 0, remaining: null };
-  const used = Number(await redis('get', usageKey(code))) || 0;
+  if (!redisReady) return { used: 0, remaining: null };
+  const used = Number(await redis('GET', usageKey(code))) || 0;
   return { used, remaining: Math.max(0, DAILY_LIMIT - used) };
 }
 
 export async function addUsage(code) {
-  if (!usageTracked) return { used: 0, remaining: null };
+  if (!redisReady) return { used: 0, remaining: null };
   const key = usageKey(code);
-  const used = Number(await redis('incr', key));
-  if (used === 1) await redis('expire', key, String(2 * 24 * 3600));
+  const used = Number(await redis('INCR', key));
+  if (used === 1) await redis('EXPIRE', key, 2 * 24 * 3600);
   return { used, remaining: Math.max(0, DAILY_LIMIT - used) };
+}
+
+/* ---------- 後台管理 ---------- */
+export function isAdmin(password) {
+  const expected = process.env.ADMIN_PASSWORD || '';
+  if (!expected || !password) return false;
+  const a = Buffer.from(String(password));
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789'; // 去掉容易看錯的 0 O 1 I L
+const part = () => Array.from({ length: 4 }, () => ALPHABET[randomInt(ALPHABET.length)]).join('');
+
+export async function createCode(note) {
+  for (let i = 0; i < 5; i++) {
+    const code = `SV-${part()}-${part()}`;
+    const record = { note: String(note || '').slice(0, 80), createdAt: Date.now(), active: true };
+    const ok = await redis('SET', codeKey(code), JSON.stringify(record), 'NX');
+    if (ok) {
+      await redis('ZADD', 'codes', record.createdAt, code);
+      return { code, ...record };
+    }
+  }
+  throw new Error('產生密碼失敗，請再試一次');
+}
+
+export async function setActive(code, active) {
+  const key = codeKey(code);
+  const raw = await redis('GET', key);
+  if (!raw) throw new Error('找不到這組密碼');
+  const record = JSON.parse(raw);
+  record.active = active;
+  await redis('SET', key, JSON.stringify(record));
+  return { code: normalize(code), ...record };
+}
+
+export async function listCodes() {
+  const codes = await redis('ZREVRANGE', 'codes', 0, 499);
+  if (!codes || !codes.length) return [];
+  const records = await redis('MGET', ...codes.map(codeKey));
+  const usage = await redis('MGET', ...codes.map(usageKey));
+  return codes.map((code, i) => {
+    let r = {};
+    try { r = JSON.parse(records[i]) || {}; } catch {}
+    return { code, note: r.note || '', createdAt: r.createdAt || 0, active: r.active !== false, usedToday: Number(usage[i]) || 0 };
+  });
 }

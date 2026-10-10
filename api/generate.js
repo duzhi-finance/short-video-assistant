@@ -15,7 +15,13 @@ export default async function handler(req, res) {
 
   const { code, topic, coreContent, style, duration, platform = '全平台通用' } = req.body || {};
 
-  if (!isValidCode(code)) {
+  let valid;
+  try {
+    valid = await isValidCode(code);
+  } catch {
+    return res.status(503).json({ error: '系統忙碌中，請稍後再試' });
+  }
+  if (!valid) {
     return res.status(401).json({ error: '密碼無效，請重新輸入' });
   }
 

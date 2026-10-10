@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <title>密碼管理 · 短影音爆款企劃大師</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600&family=Noto+Serif+TC:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,500;0,600;1,400&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="/assets/tailwind-config.js"></script>
+  <link rel="stylesheet" href="/assets/site.css">
+  <style>
+    .code-font { font-variant-numeric: tabular-nums; letter-spacing: .12em; }
+  </style>
+</head>
+<body data-page="admin" class="antialiased min-h-screen">
+  <div id="site-header"></div>
+
+  <!-- 登入 -->
+  <section id="loginView" class="max-w-md mx-auto px-4 py-16 md:py-24">
+    <form id="loginForm" class="bg-white rounded-3xl border border-editorial-border shadow-sm p-7 md:p-8">
+      <p class="font-display italic text-editorial-accent text-sm">Admin</p>
+      <h1 class="font-serif font-bold text-2xl md:text-3xl mt-1">密碼管理後台</h1>
+      <p class="text-sm text-editorial-muted mt-3 leading-relaxed">輸入你在 Vercel 設定的管理密碼（ADMIN_PASSWORD）。</p>
+      <label for="adminPw" class="sr-only">管理密碼</label>
+      <input id="adminPw" type="password" autocomplete="current-password" placeholder="管理密碼"
+        class="w-full mt-6 text-base p-4 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none">
+      <label class="flex items-center gap-2 mt-3 text-xs text-editorial-muted cursor-pointer">
+        <input id="rememberMe" type="checkbox" checked class="accent-[#B88E52]"> 在這台裝置記住我
+      </label>
+      <p id="loginError" class="hidden text-xs text-[#A4482F] mt-3"></p>
+      <button id="loginBtn" type="submit" class="w-full mt-4 bg-editorial-dark hover:bg-editorial-accent text-white py-4 rounded-2xl transition font-medium disabled:opacity-60">登入</button>
+    </form>
+  </section>
+
+  <!-- 後台 -->
+  <main id="adminView" class="hidden max-w-5xl mx-auto px-4 py-10 md:py-14">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+      <div>
+        <p class="font-display italic text-editorial-accent text-sm">Admin</p>
+        <h1 class="font-serif font-bold text-3xl md:text-4xl mt-1">密碼管理</h1>
+      </div>
+      <div class="flex gap-6 text-sm">
+        <div><p class="text-[11px] tracking-widest text-editorial-muted">已發出</p><p class="font-serif font-bold text-2xl tabular-nums" id="statTotal">0</p></div>
+        <div><p class="text-[11px] tracking-widest text-editorial-muted">使用中</p><p class="font-serif font-bold text-2xl tabular-nums" id="statActive">0</p></div>
+        <div><p class="text-[11px] tracking-widest text-editorial-muted">今日有用</p><p class="font-serif font-bold text-2xl tabular-nums" id="statToday">0</p></div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mt-8 items-start">
+      <!-- 產生密碼 -->
+      <section class="lg:col-span-5 bg-white rounded-3xl border border-editorial-border p-6 md:p-7 lg:sticky lg:top-24">
+        <h2 class="font-serif font-bold text-xl">新增一組密碼</h2>
+        <p class="text-sm text-editorial-muted mt-1">有人付款後，在這裡產生密碼給他。</p>
+        <form id="createForm" class="mt-5 grid gap-3">
+          <label for="note" class="text-[11px] font-semibold tracking-widest text-editorial-muted">買家備註（名字、Email 或訂單編號）</label>
+          <input id="note" type="text" maxlength="80" placeholder="例如：王小美 / amy@gmail.com"
+            class="w-full text-sm p-3.5 rounded-2xl border border-editorial-border bg-editorial-bg/60 focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none">
+          <button id="createBtn" type="submit" class="w-full bg-editorial-dark hover:bg-editorial-accent text-white py-3.5 rounded-2xl transition font-medium disabled:opacity-60">產生新密碼</button>
+        </form>
+
+        <!-- 剛產生的密碼 -->
+        <div id="createdCard" class="hidden mt-6 rounded-2xl bg-editorial-card border border-editorial-accent/50 p-5 fade-in">
+          <p class="text-[11px] tracking-widest text-editorial-accentHover">新密碼已產生</p>
+          <p id="createdCode" class="code-font font-display font-semibold text-2xl md:text-3xl mt-2 select-all break-all"></p>
+          <p id="createdNote" class="text-xs text-editorial-muted mt-1"></p>
+          <div class="grid grid-cols-2 gap-2 mt-4">
+            <button id="copyCode" class="text-xs bg-white border border-editorial-border hover:border-editorial-accent py-2.5 rounded-xl transition">複製密碼</button>
+            <button id="copyMessage" class="text-xs bg-editorial-dark hover:bg-editorial-accent text-white py-2.5 rounded-xl transition">複製給買家的訊息</button>
+          </div>
+          <details class="mt-3 group">
+            <summary class="text-xs text-editorial-muted cursor-pointer list-none">預覽訊息內容 <span class="group-open:hidden">▾</span><span class="hidden group-open:inline">▴</span></summary>
+            <pre id="messagePreview" class="mt-2 whitespace-pre-wrap text-xs leading-relaxed bg-white rounded-xl border border-editorial-border p-3 font-sans"></pre>
+          </details>
+        </div>
+      </section>
+
+      <!-- 密碼列表 -->
+      <section class="lg:col-span-7 min-w-0">
+        <div class="flex items-center gap-3">
+          <label for="search" class="sr-only">搜尋</label>
+          <input id="search" type="search" placeholder="搜尋密碼或備註"
+            class="flex-1 min-w-0 text-sm p-3 rounded-2xl border border-editorial-border bg-white focus:ring-2 focus:ring-editorial-accent/30 focus:border-editorial-accent focus:outline-none">
+          <button id="refreshBtn" class="shrink-0 text-xs border border-editorial-border hover:border-editorial-accent bg-white px-4 py-3 rounded-2xl transition">重新整理</button>
+        </div>
+        <p id="listError" class="hidden text-sm text-[#A4482F] bg-white border border-editorial-border rounded-2xl p-4 mt-4"></p>
+        <div id="codeList" class="grid gap-3 mt-4"></div>
+      </section>
+    </div>
+  </main>
+
+  <div id="site-footer"></div>
+  <script src="/assets/site.js"></script>
+  <script>
+    const $ = id => document.getElementById(id);
+    const KEY = 'sv_admin_pw';
+    const TOOL_URL = location.origin + '/app';
+    let adminPw = '';
+    let codes = [];
+    let dailyLimit = SITE.dailyLimit;
+
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+    const saved = {
+      get() { try { return localStorage.getItem(KEY) || sessionStorage.getItem(KEY) || ''; } catch { return ''; } },
+      set(v, remember) { try { (remember ? localStorage : sessionStorage).setItem(KEY, v); } catch {} },
+      clear() { try { localStorage.removeItem(KEY); sessionStorage.removeItem(KEY); } catch {} }
+    };
+
+    async function api(action, extra = {}) {
+      const res = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminPassword: adminPw, action, ...extra })
+      });
+      let data = {};
+      try { data = await res.json(); } catch { throw new Error('伺服器沒有回應，請稍後再試'); }
+      if (!res.ok) {
+        const e = new Error(data.error || '操作失敗');
+        e.status = res.status;
+        throw e;
+      }
+      return data;
+    }
+
+    function copy(text, msg) {
+      navigator.clipboard.writeText(text).then(() => toast(msg)).catch(() => toast('複製失敗，請長按文字手動複製'));
+    }
+
+    function buyerMessage(code) {
+      return `謝謝你購買「${SITE.name}」！
+
+工具網址：${TOOL_URL}
+你的使用密碼：${code}
+
+打開網址、輸入密碼就能開始使用，同一台裝置之後會自動記住。
+每天可以生成 ${dailyLimit} 份企劃，每晚 12 點重置。
+密碼僅供你本人使用，請不要分享給其他人。`;
+    }
+
+    /* ---------- 登入 ---------- */
+    function showLogin(message) {
+      $('adminView').classList.add('hidden');
+      $('loginView').classList.remove('hidden');
+      $('memberSlot') && ($('memberSlot').innerHTML = '');
+      $('loginError').textContent = message || '';
+      $('loginError').classList.toggle('hidden', !message);
+    }
+
+    function showAdmin() {
+      $('loginView').classList.add('hidden');
+      $('adminView').classList.remove('hidden');
+      const slot = $('memberSlot');
+      if (slot) {
+        slot.innerHTML = `<span class="hidden sm:inline text-xs px-3 py-1.5 rounded-full bg-editorial-card border border-editorial-border text-editorial-accentHover">管理者</span>
+          <button id="btnLogout" class="text-xs border border-editorial-border hover:border-editorial-accent bg-white px-3 py-1.5 rounded-full transition">登出</button>`;
+        $('btnLogout').addEventListener('click', () => { adminPw = ''; saved.clear(); showLogin('已登出'); });
+      }
+    }
+
+    async function tryLogin(pw, remember) {
+      adminPw = pw;
+      const data = await api('list');
+      saved.set(pw, remember);
+      codes = data.codes;
+      dailyLimit = data.dailyLimit || dailyLimit;
+      showAdmin();
+      renderList();
+    }
+
+    $('loginForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const pw = $('adminPw').value;
+      if (!pw) return showLogin('請輸入管理密碼');
+      $('loginBtn').disabled = true;
+      $('loginBtn').textContent = '登入中…';
+      try {
+        await tryLogin(pw, $('rememberMe').checked);
+      } catch (err) {
+        adminPw = '';
+        showLogin(err.message);
+      } finally {
+        $('loginBtn').disabled = false;
+        $('loginBtn').textContent = '登入';
+      }
+    });
+
+    /* ---------- 列表 ---------- */
+    function fmtDate(ts) {
+      if (!ts) return '';
+      const d = new Date(ts);
+      return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+    }
+
+    function renderList() {
+      $('statTotal').textContent = codes.length;
+      $('statActive').textContent = codes.filter(c => c.active).length;
+      $('statToday').textContent = codes.filter(c => c.usedToday > 0).length;
+
+      const q = $('search').value.trim().toLowerCase();
+      const rows = codes.filter(c => !q || c.code.toLowerCase().includes(q) || c.note.toLowerCase().includes(q));
+
+      if (!codes.length) {
+        $('codeList').innerHTML = `
+          <div class="bg-white rounded-2xl border border-dashed border-editorial-border p-8 text-center">
+            <p class="font-serif font-semibold">還沒有發出任何密碼</p>
+            <p class="text-sm text-editorial-muted mt-1">有人付款後，在左邊填上備註、按「產生新密碼」。</p>
+          </div>`;
+        return;
+      }
+      if (!rows.length) {
+        $('codeList').innerHTML = `<p class="text-sm text-editorial-muted text-center py-8">找不到符合「${esc(q)}」的密碼</p>`;
+        return;
+      }
+
+      $('codeList').innerHTML = rows.map(c => `
+        <article class="bg-white rounded-2xl border border-editorial-border p-4 md:p-5 flex flex-col sm:flex-row sm:items-center gap-3 ${c.active ? '' : 'opacity-60'}">
+          <div class="min-w-0 flex-1">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="code-font font-semibold text-base">${esc(c.code)}</span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full border ${c.active
+                ? 'border-[#9DB89A] text-[#4F6B4C] bg-[#EEF3EC]'
+                : 'border-editorial-border text-editorial-muted bg-editorial-bg'}">${c.active ? '使用中' : '已停用'}</span>
+            </div>
+            <p class="text-sm mt-1 truncate">${c.note ? esc(c.note) : '<span class="text-editorial-muted">（沒有備註）</span>'}</p>
+            <p class="text-[11px] text-editorial-muted mt-1 tabular-nums">${fmtDate(c.createdAt)} 建立 · 今日 ${c.usedToday} / ${dailyLimit} 次</p>
+          </div>
+          <div class="flex gap-2 shrink-0">
+            <button data-copy-msg="${esc(c.code)}" class="text-xs border border-editorial-border hover:border-editorial-accent px-3 py-2 rounded-xl transition">複製訊息</button>
+            <button data-toggle="${esc(c.code)}" data-active="${c.active ? 1 : 0}" class="text-xs px-3 py-2 rounded-xl transition ${c.active
+              ? 'border border-editorial-border hover:border-[#A4482F] hover:text-[#A4482F]'
+              : 'bg-editorial-dark text-white hover:bg-editorial-accent'}">${c.active ? '停用' : '重新啟用'}</button>
+          </div>
+        </article>`).join('');
+    }
+
+    async function refresh() {
+      $('listError').classList.add('hidden');
+      try {
+        const data = await api('list');
+        codes = data.codes;
+        renderList();
+      } catch (err) {
+        if (err.status === 401) { saved.clear(); return showLogin('請重新登入'); }
+        $('listError').textContent = err.message;
+        $('listError').classList.remove('hidden');
+      }
+    }
+
+    $('search').addEventListener('input', renderList);
+    $('refreshBtn').addEventListener('click', async () => { await refresh(); toast('已更新'); });
+
+    $('codeList').addEventListener('click', async e => {
+      const msgBtn = e.target.closest('[data-copy-msg]');
+      if (msgBtn) return copy(buyerMessage(msgBtn.dataset.copyMsg), '已複製給買家的訊息');
+
+      const tg = e.target.closest('[data-toggle]');
+      if (!tg) return;
+      const code = tg.dataset.toggle;
+      const willDisable = tg.dataset.active === '1';
+      tg.disabled = true;
+      try {
+        await api(willDisable ? 'disable' : 'enable', { code });
+        const item = codes.find(c => c.code === code);
+        if (item) item.active = !willDisable;
+        renderList();
+        toast(willDisable ? `${code} 已停用` : `${code} 已重新啟用`);
+      } catch (err) {
+        toast(err.message);
+        tg.disabled = false;
+      }
+    });
+
+    /* ---------- 產生密碼 ---------- */
+    let lastCode = '';
+    $('createForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      $('createBtn').disabled = true;
+      $('createBtn').textContent = '產生中…';
+      try {
+        const { created } = await api('create', { note: $('note').value.trim() });
+        lastCode = created.code;
+        $('createdCode').textContent = created.code;
+        $('createdNote').textContent = created.note ? '備註：' + created.note : '';
+        $('messagePreview').textContent = buyerMessage(created.code);
+        $('createdCard').classList.remove('hidden');
+        $('note').value = '';
+        codes.unshift({ code: created.code, note: created.note, createdAt: created.createdAt, active: true, usedToday: 0 });
+        renderList();
+      } catch (err) {
+        if (err.status === 401) { saved.clear(); showLogin('請重新登入'); }
+        else toast(err.message);
+      } finally {
+        $('createBtn').disabled = false;
+        $('createBtn').textContent = '產生新密碼';
+      }
+    });
+
+    $('copyCode').addEventListener('click', () => lastCode && copy(lastCode, '已複製密碼'));
+    $('copyMessage').addEventListener('click', () => lastCode && copy(buyerMessage(lastCode), '已複製給買家的訊息'));
+
+    /* ---------- 開啟時自動登入 ---------- */
+    document.addEventListener('DOMContentLoaded', async () => {
+      const pw = saved.get();
+      if (!pw) return showLogin();
+      try {
+        await tryLogin(pw, true);
+      } catch (err) {
+        adminPw = '';
+        if (err.status === 401) saved.clear();
+        showLogin(err.status === 401 ? '' : err.message);
+      }
+    });
+  </script>
+</body>
+</html>

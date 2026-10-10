@@ -6,14 +6,21 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: '只接受 POST' });
   }
   const { code } = req.body || {};
-  if (!isValidCode(code)) {
+
+  let valid;
+  try {
+    valid = await isValidCode(code);
+  } catch {
+    return res.status(503).json({ ok: false, error: '系統忙碌中，請稍後再試' });
+  }
+  if (!valid) {
     return res.status(401).json({ ok: false, error: '密碼不正確，請確認付款完成通知裡的密碼' });
   }
+
   try {
     const usage = await getUsage(code);
     return res.status(200).json({ ok: true, dailyLimit: DAILY_LIMIT, ...usage });
-  } catch (err) {
-    // 計次服務暫時出問題時，仍讓買家進入
+  } catch {
     return res.status(200).json({ ok: true, dailyLimit: DAILY_LIMIT, used: 0, remaining: null });
   }
 }
