@@ -1,7 +1,8 @@
 // 生成企劃。環境變數：GEMINI_API_KEY（必填），密碼與次數設定見 _access.js
 import { isValidCode, getUsage, addUsage, DAILY_LIMIT } from './_access.js';
 
-const MODEL = 'gemini-2.5-flash'; // 如果 Google 改了模型名稱，改這裡就好
+// 模型名稱。Google 換新模型時，在 Vercel 環境變數設定 GEMINI_MODEL 就能更換，不用改程式
+const MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
