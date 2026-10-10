@@ -74,31 +74,37 @@ export default async function handler(req, res) {
   "hashtags": "#標籤1 #標籤2 #標籤3"
 }`;
 
-  try {
-    const aiRes = await fetch(
+  // 呼叫 Gemini；lowThinking 會請模型少想一點、回答快一點
+  const callGemini = async lowThinking => {
+    const generationConfig = { responseMimeType: 'application/json' };
+    if (lowThinking) generationConfig.thinkingConfig = { thinkingLevel: 'low' };
+    const r = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
       {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'x-goog-api-key': apiKey,
-        },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            responseMimeType: 'application/json',
-            temperature: 0.9,
-          },
-        }),
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+        body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig }),
+        signal: AbortSignal.timeout(55000),
       }
     );
+    return { r, data: await r.json() };
+  };
 
-    const aiData = await aiRes.json();
+  try {
+    let { r: aiRes, data: aiData } = await callGemini(true);
+    // 如果這個模型不支援調整思考程度，改用預設設定再試一次
+    if (aiRes.status === 400 && /think/i.test(aiData.error?.message || '')) {
+      ({ r: aiRes, data: aiData } = await callGemini(false));
+    }
     if (!aiRes.ok) {
       return res.status(500).json({ error: aiData.error?.message || 'AI 服務出錯' });
     }
 
-    let text = aiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    // 只取正式回答的部分（略過模型的思考內容）
+    let text = (aiData.candidates?.[0]?.content?.parts || [])
+      .filter(p => !p.thought && p.text)
+      .map(p => p.text)
+      .join('');
     // 保險：清掉可能出現的 ```json 包裝
     text = text.replace(/```json|```/g, '').trim();
 
@@ -114,6 +120,12 @@ export default async function handler(req, res) {
 
     return res.status(200).json({ result, remaining: usage.remaining, dailyLimit: DAILY_LIMIT });
   } catch (err) {
+    if (err.name === 'TimeoutError' || err.name === 'AbortError') {
+      return res.status(504).json({ error: 'AI 回應太久，請再按一次生成' });
+    }
+    if (err instanceof SyntaxError) {
+      return res.status(500).json({ error: 'AI 回傳格式不完整，請再試一次' });
+    }
     return res.status(500).json({ error: '生成失敗：' + err.message });
   }
 }

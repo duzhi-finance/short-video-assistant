@@ -1,5 +1,8 @@
 {
   "cleanUrls": true,
+  "functions": {
+    "api/generate.js": { "maxDuration": 60 }
+  },
   "redirects": [
     { "source": "/terms", "destination": "/#terms", "permanent": false },
     { "source": "/account", "destination": "/app", "permanent": false },

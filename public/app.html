@@ -138,7 +138,7 @@
         <div id="loadingState" class="hidden bg-white p-12 rounded-3xl border border-editorial-border text-center min-h-[420px] flex flex-col items-center justify-center">
           <div class="w-8 h-8 border-2 border-editorial-accent border-t-transparent rounded-full animate-spin mb-4"></div>
           <p class="font-serif text-lg font-semibold">正在撰寫你的爆款企劃…</p>
-          <p class="text-editorial-muted text-xs mt-1">安排開場、分鏡與結尾節奏中</p>
+          <p class="text-editorial-muted text-xs mt-1">安排開場、分鏡與結尾節奏中，大約需要 10 到 30 秒</p>
         </div>
 
         <div id="resultState" class="space-y-5">
@@ -448,13 +448,21 @@
       $('btnSubmit').disabled = true;
 
       try {
-        const res = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        });
+        let res;
+        try {
+          res = await fetch('/api/generate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+            signal: AbortSignal.timeout(70000)
+          });
+        } catch (err) {
+          throw new Error(err.name === 'TimeoutError' ? 'AI 回應太久，請再按一次生成' : '網路連線中斷，請檢查網路後再試');
+        }
         let data;
-        try { data = await res.json(); } catch { throw new Error('伺服器沒有回應，請稍後再試'); }
+        try { data = await res.json(); } catch {
+          throw new Error(res.status === 504 ? 'AI 回應太久，請再按一次生成' : '伺服器沒有回應，請稍後再試');
+        }
         if (res.status === 401) { logout('密碼已失效，請重新輸入'); return; }
         if (res.status === 429) setRemaining(0, data.dailyLimit);
         if (!res.ok) throw new Error(data.error || '生成失敗');
